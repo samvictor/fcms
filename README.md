@@ -78,6 +78,153 @@ var config = {
 };
 ```
 
+### 4. Setup an Admin in Firebase Auth
+Now you need to create an admin account for your website.
+This will be the only account that can edit pages and essential details about your website,
+besides user posts/comments. 
+
+Go into the *Authentication* section of your Firebase Console 
+(https://console.firebase.google.com/project/<project-name>/authentication/users).
+
+Enable "*Google*" as a sign-in method from the *Sign-In Method* tab.  
+
+From the *Users* tab, create your Admin user.
+
+Copy that user's *User UID*.
+
+Go to the *Database* section of your Firebase Console.
+
+In the *Rules* tab, add the following rules:
+
+```
+
+"fcms_data": {
+      ".read": false,
+    	".write": "auth.uid === '<YOUR ADMIN AUTH UID HERE>'",
+        
+    	"gen_site_data": {
+        ".read": true
+      },
+      "pages": {
+        ".read": true
+      },
+        
+      "users": {
+        ".read": false,
+        ".indexOn": ["username", "full_name", "last_login", "privacy", "hidden"],
+        "$uid": {
+        	".read": "$uid === auth.uid",
+        	".write": "$uid === auth.uid",
+            
+          "pub_data": {
+            ".read": true,
+          },
+          "friend_data": {
+            "$connection": {
+              ".read": "$uid === auth.uid || 
+              					data.parent().parent().child('connection')
+                          .child($connection).child(auth.uid).exists()",
+            }
+          },
+          "priv_data": {
+            ".read": "$uid === auth.uid"
+          },
+            
+          "connection": {
+            ".read": "$uid === auth.uid ||
+            					data.child('friends').child(auth.uid).exists()",
+          },
+            
+          "posts_made": {
+            ".indexOn": ["date_made", "target_user", "target_post", "type", "privacy", "hidden"],
+            "$pid": {
+              ".read": "$uid === auth.uid ||
+              					(data.child('privacy').val() === 'public' && 
+                         	data.child('type').val() != 'message') ||
+              					data.child('list_targets').child(auth.uid).exists()",
+            },
+          },
+          "posts_received": {
+        		".read": "$uid === auth.uid",
+            ".indexOn": ["date_recieved", "target_post", "source", "type", "privacy", "hidden"]
+          },
+            
+          "wall": {
+        		".read": true,
+            ".indexOn": ["date_made", "target_post", "source", "type", "hidden"]
+          },
+          "connected_wall": {
+            "$connection": {
+              ".read": "$uid === auth.uid ||
+                        data.parent().parent().child('connection')
+                        	.child($connection).child(auth.uid).exists()",
+              ".indexOn": ["date_made", "target_post", "source", "type", "privacy", "hidden"]
+            }
+          },
+          "priv_wall": {
+        		".read": "$uid === auth.uid",
+            ".indexOn": ["date_made", "target_post", "source", "type", "hidden"]
+          }
+        }
+      },
+      "public_user_list": {
+        ".read": "auth != null",
+      },
+      "nexus": {
+        ".read": true,
+        ".write": "auth != null",
+        ".indexOn": ["date", "target_user", "source", "type"],
+        "$nid": {
+          ".write": "!data.exists() ||
+          						data.child('target_user').val() === auth.uid"
+        } 
+      }
+    }
+
+```
+
+Put these rules in the open curly braces of the existing `rules` variable. 
+You also need to set the existing global `.read` and `.write` rules to `false`
+In context, it should look like this.
+
+```
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    
+    "fcms_data": {
+        ".read": false,
+    	".write": "auth.uid === '<YOUR ADMIN AUTH UID HERE>'",
+        ... other fcms rules ...
+    }
+    
+    ... other database rules ...
+}
+
+```
+
+Make sure to replace **<YOUR ADMIN AUTH UID HERE>**, on the 3rd line,
+with the uid that you copied from the Firebase console.
+
+If you would like to add other Admin users, 
+you need to update this database rule in the following pattern.
+
+```
+".write": "auth.uid === '<ADMIN AUTH UID 1>' ||
+                auth.uid === '<ADMIN AUTH UID 2>' ||
+                auth.uid === '<ADMIN AUTH UID 3>'",
+```
+
+
+**Important**:
+If you have *Database* enabled in the Firebase Folder on your local machine, 
+you will need to add these rules to your *database.rules.json* file also. 
+Otherwise, the next time you *deploy*, your database rules will be overwritten.
+If you do not have a *database.rules.json* file in your Firebase directory, 
+Then you probably do not have *database* enabled in that directory and you can ignore this notice.
+
+
 
 
 

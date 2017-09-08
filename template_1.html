@@ -413,3 +413,31 @@
     };
   </script>
 </html>
+
+
+<!-- 
+
+    group posts create multiple nexus entries, but when claimed, point to only one source
+    nexus entries can only be deleted/claimed by target
+    nexus entries cannot be updated, only created or deleted
+
+
+    general user data  is sorted into categories like so:
+    pub_data, friend_data, private_data
+    
+    you must be friends to see most data
+    friends, some wall posts, some data
+    in db, this data is structured as follows:
+    friend_wall {
+        friends { // really means "connected at all"
+            data
+        }
+        close_friends {
+            data
+        }
+        ...
+    }
+    
+    every post has target user, and list_targets that includes target_user
+    
+-->

@@ -60,6 +60,14 @@
   </head>
   <body>
     <h1 class="step_1">WELCOME</h1>
+    <div style="display: none" class="not_ready">
+        <h3>settings.js file either either not found or "ready" set to "no"</h3>
+        <p>Please visit 
+            <a href="https://github.com/samvictor/FCMS#3-get-your-firebase-config-info">
+                github.com/samvictor/FCMS#3-get-your-firebase-config-info
+            </a> 
+            to set up your settings file.</p>
+    </div>
     <div style="display: none" class="step_2">
       <h3>Choose Your Site Name </h3>
       <input id="site_name" placeholder="Site Name" class="form-control">
@@ -94,8 +102,19 @@
     <div id="alert_warning" role="alert" class="alert alert-warning"></div>
     <div id="alert_danger" role="alert" class="alert alert-danger"></div>
   </body>
+  <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
+  <script src="settings1.js"></script>
   <script>
-    $('.step_1').delay(500).animate({'padding-top': '20px'}, function(){ $('.step_2').fadeIn(); });
+    
+    firebase.initializeApp(config1);
+    $('.step_1').delay(500).animate({'padding-top': '20px'}, function(){
+        if (typeof settings === 'undefined' || settings['ready'] === 'no') {
+            $('.not_ready').fadeIn();
+            return;
+        }
+        $('.step_2').fadeIn(); 
+    });
+    
     $('#site_color').on('keyup', function () {
     	$('#color_picker_display').css('background-color', this.value);
     	console.log('changing color');
