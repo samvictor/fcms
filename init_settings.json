@@ -1,0 +1,11 @@
+{
+	"ready": "no", 
+	"email": "", 
+	"password": "", 
+	"root": "",
+	"apiKey": "",
+	"authDomain": "",
+	"databaseURL": "",
+	"projectId": "",
+	"template_id": "0"
+}

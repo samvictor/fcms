@@ -1,0 +1,5 @@
+settings.json
+fcms_serve/*
+
+#keep empty folder
+!fcms_serve/.gitkeep 
