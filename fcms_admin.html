@@ -1,0 +1,131 @@
+<!-- Written by Sam for scms-->
+<!-- setup.html-->
+<!-- This page should help complete the installation process-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCMS Setup</title>
+    <meta name="theme-color" content="#bd2031">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <style>
+      h1, h2, h3, h4, h5, h6, t, p, body {
+          font-family: sans-serif;
+          text-align: center;
+          color: #101010;
+      }
+      h4, h5 { color: #282828; }
+      body { background-color: #f8f8f8; }
+      .step_1{
+      	padding-top: 200px;
+      	font-weight: 100;
+      }
+      .step_2{
+      	padding-top: 10px;
+      	font-weight: 100;
+      }
+      #color_picker_display {
+      	width: 60%;
+      	height: 100px;
+      	border: solid 1px #202020;
+      	margin: 10px auto 5px auto;
+      	background-color: #cb2031;
+      }
+      input, textarea {
+      	color: black;
+      	padding: 3px;
+      	padding-left: 7px;
+      	width: 60% !important;
+      	margin-left: auto;
+      	margin-right: auto;
+      	text-align: center;
+      }
+      #tabs, #enter {
+      	width: 60%;
+      	margin: 3px auto 10px auto;
+      }
+      .alert {
+        display: none;
+        position: fixed;
+        top: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="step_1">WELCOME</h1>
+    <div style="display: none" class="step_2">
+      <h3>Choose Your Site Name </h3>
+      <input id="site_name" placeholder="Site Name" class="form-control">
+      <h3>Header Image Url</h3>
+      <h4>full path</h4>
+      <input id="header_image" placeholder="https://example.com/header_img.png" class="form-control">
+      <h3>Header Image Ratio</h3>
+      <h4>to prevent page popping (image width/image height)</h4>
+      <input id="header_ratio" placeholder="2.54019" type="number">
+      <h3>Favicon Url</h3>
+      <h4>full path</h4>
+      <input id="favicon" placeholder="https://example.com/favicon_img.jpg" class="form-control">
+      <h3>Tabs </h3>
+      <h4>(leave blank for no tabs, semicolon ";" separated)</h4>
+      <textarea id="tabs" class="form-control">Home; News; Contact Us</textarea>
+      <h3>Background Image</h3>
+      <h4>full path</h4>
+      <input id="background_image" placeholder="https://example.com/background_image.png" class="form-control">
+      <h3>Slideshow Images</h3>
+      <h4>(semicolon ";" separated)</h4>
+      <textarea id="slideshow_images" placeholder="https://example.com/image1.jpg; https://example.com/image2.jpg; https://example.com/image_3.png" class="form-control"></textarea>
+      <h3>Choose Site Color </h3>
+      <h4>(hex rbg, include the hash)</h4>
+      <input id="site_color" value="#cb2031" class="form-control">
+      <div id="color_picker_display"></div>
+      <h3>Enter Your Password</h3>
+      <input id="password" type="password" class="form-control"><br>
+      <button id="enter" class="btn btn-success">Let's Go</button><br>
+    </div>
+    <div id="alert_success" role="alert" class="alert alert-success"></div>
+    <div id="alert_info" role="alert" class="alert alert-info"></div>
+    <div id="alert_warning" role="alert" class="alert alert-warning"></div>
+    <div id="alert_danger" role="alert" class="alert alert-danger"></div>
+  </body>
+  <script>
+    $('.step_1').delay(500).animate({'padding-top': '20px'}, function(){ $('.step_2').fadeIn(); });
+    $('#site_color').on('keyup', function () {
+    	$('#color_picker_display').css('background-color', this.value);
+    	console.log('changing color');
+    });
+    function submit() {
+    	$('#alert_info').text('Working...').fadeIn().delay(1000).fadeOut();
+      let to_post = { 'site': $('#site_name').val(), 'tabs': $('#tabs').val(),
+    	                'color': $('#site_color').val(), 'password': $('#password').val(),
+    	                'header_image': $('#header_image').val(), 'header_ratio': $('#header_ratio').val(),
+    	                'favicon': $('#favicon').val(), 'background_image': $('#background_image').val(),
+    	                'slideshow_images': $('#slideshow_images').val()};
+    	$.post( document.URL, to_post)
+            .done(function( data ) {
+                data = data.split(':');
+                data[1] = data[1].trim();
+                if (data[0] === 'thumbs up') {
+                  $('#alert_success').text(data[1]).fadeIn().delay(2400).fadeOut();
+                  location.reload(true);
+                }
+                else {
+                  $('#alert_danger').text(data[1]).fadeIn().delay(2400).fadeOut();
+                }
+            });
+    }
+    $('#enter').on('click', submit);
+    $('#password').on('keypress', function(e){
+    	if(e.which === 13) {
+          submit();
+      }
+    });
+    $('textarea').autoResize();
+  </script>
+</html>
