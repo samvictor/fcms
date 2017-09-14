@@ -51,7 +51,7 @@ Finally, find and rename */public/fcms/init_settings.js* to */public/fcms/settin
 
 ### 3. Get your Firebase Config Info
 Once you've created your Firebase account, go to the *Overview* tab in your Firebase console.
-*console.firebase.google.com/project/<your project name>/overview*
+`console.firebase.google.com/project/<your project name>/overview`
 
 Click on the button that says "Add Firebase to your web app".
 If you've already connected an app to this project, then click on "Add another app" first, then click "Web".
@@ -84,7 +84,7 @@ This will be the only account that can edit pages and essential details about yo
 besides user posts/comments. 
 
 Go into the *Authentication* section of your Firebase Console 
-(https://console.firebase.google.com/project/<project-name>/authentication/users).
+`https://console.firebase.google.com/project/<project-name>/authentication/users`.
 
 Enable "*Email/Password*" as a sign-in method from the *Sign-In Method* tab.  
 
@@ -239,17 +239,16 @@ If your FCMS index.html and template files are located at */public/sub/index.htm
 and */public/sub/template_1.html* etc., then */public/sub/* is your FCMS directory 
 and *example.com/sub/* is your FCMS url.
 
-When you hit your FCMS url, 
-you should see a loading screen that never ends. 
+When you hit your FCMS url, you should see a loading screen that never ends. 
 This is expected.
 
 If you haven't yet connected a custom domain to your project, 
 you can use the one provided automatically by Firebase. 
 You can find this domain in the console print-out after you deploy. 
 It will be named "*Hosting URL:*". 
-If your hosting url is "*https://<proj-id>.firebaseapp.com*", 
+If your hosting url is `https://<proj-id>.firebaseapp.com`, 
 and your FCMS directory is "*/public/fcms/*",
-then your FCMS url is "*https://<proj-id>.firebaseapp.com/fcms/*"
+then your FCMS url is `https://<proj-id>.firebaseapp.com/fcms/`
 
 
 ### 6. Serving Static Assets & Files
@@ -257,11 +256,13 @@ Any static assets or files that you need for your website (such as images, video
 should be placed in the folder named "*/public/fcms/fcms_serve/*".
 You can then use those same assets using the following url format:
 
-    FCMS_url/fcms_serve/<file_name> 
-    or in this case
-    *example.com/fcms/fcms_serve/<file_name>*
+```
+FCMS_url/fcms_serve/<file_name> 
+or in this case
+*example.com/fcms/fcms_serve/<file_name>*
+```
 
-Remember that after adding any file to this or any directory,
+Remember that after adding any file to this or any other directory,
 you must deploy again before you see the change on your website.
 
 **FYI:** You can change the name of the */fcms_serve/* directory, and thus its corresponding url,
@@ -292,10 +293,12 @@ So, if you go to *FCMS_url/README.md* or *example.com/fcms/README.md* in this ca
 you will find this file. If that bothers you, just delete this README file, you're done with it anyway.
 For that matter, you can delete every file in this directory except for the following:
 
-    index.html
-    settings.js
-    fcms_admin/
-    fcms_serve/
+```
+index.html
+settings.js
+fcms_admin/
+fcms_serve/
+```
 
 As long as you have those four files and folders, your website will run just fine. 
 However, you might want to keep the other templates in case you decide to change your template later on.
