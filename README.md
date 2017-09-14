@@ -1,5 +1,5 @@
 # FCMS
-A CMS solution that can be run in a static environment. Uses and requires Firebase.
+A CMS solution that can be run in a static environment. Uses Firebase and Bootstrap.
 
 ## Let's Begin
 ### 1. Create a Firebase Account and Project
@@ -37,11 +37,15 @@ firebase_project/
 ```
 
 If you would like FCMS to be installed at the root of your domain (*example.com/*),
-delete *public/index.html* and copy the contents of *public/fcms/* into *public/*. 
+delete */public/index.html* and copy the contents of */public/fcms/* into */public/*. 
+*/public/* is now your FCMS directory and *example.com/* is your FCMS url.
+
 If you would like FCMS to be installed into a subdirectory (*example.com/sub/*),
 change the name of the *public/fcms/* folder to something else (*/public/sub/*).
+In this case, */public/sub/* is your FCMS directory and *example.com/sub/* is your FCMS url.
 
-I'll continue these instructions assuming you didn't change the *public/fcms/* folder.
+I'll continue these instructions assuming you didn't change anything and */public/fcms/* 
+is your FCMS directory.
 
 Finally, find and rename */public/fcms/init_settings.js* to */public/fcms/settings.js*
 
@@ -61,10 +65,6 @@ When you're done, you should have a */public/fcms/settings.js* file that looks l
 
 ```
 settings = {
-	"ready": "no", 
-	"email": "", 
-	"password": "", 
-	"root": ""
 };
 
 // Initialize Firebase
@@ -86,9 +86,9 @@ besides user posts/comments.
 Go into the *Authentication* section of your Firebase Console 
 (https://console.firebase.google.com/project/<project-name>/authentication/users).
 
-Enable "*Google*" as a sign-in method from the *Sign-In Method* tab.  
+Enable "*Email/Password*" as a sign-in method from the *Sign-In Method* tab.  
 
-From the *Users* tab, create your Admin user.
+From the *Users* tab, create your Admin user with the *Add User* button.
 
 Copy that user's *User UID*.
 
@@ -225,6 +225,91 @@ If you do not have a *database.rules.json* file in your Firebase directory,
 Then you probably do not have *database* enabled in that directory and you can ignore this notice.
 
 
+### 5. Hit the Site
+Make sure you deploy your changes with `firebase deploy --only hosting`.
+The `--only hosting` part is not necessary, but it should make deploying faster.
 
+Now try hiting your FCMS url.
+
+If you've already forgotten what I mean by FCMS url and FCMS directory,
+I talked about it in "*step 1*" but I'll explain it again.
+
+Your FCMS_url will depend on where you "installed" or pasted FCMS. 
+If your FCMS index.html and template files are located at */public/sub/index.html* 
+and */public/sub/template_1.html* etc., then */public/sub/* is your FCMS directory 
+and *example.com/sub/* is your FCMS url.
+
+When you hit your FCMS url, 
+you should see a loading screen that never ends. 
+This is expected.
+
+If you haven't yet connected a custom domain to your project, 
+you can use the one provided automatically by Firebase. 
+You can find this domain in the console print-out after you deploy. 
+It will be named "*Hosting URL:*". 
+If your hosting url is "*https://<proj-id>.firebaseapp.com*", 
+and your FCMS directory is "*/public/fcms/*",
+then your FCMS url is "*https://<proj-id>.firebaseapp.com/fcms/*"
+
+
+### 6. Serving Static Assets & Files
+Any static assets or files that you need for your website (such as images, videos, PDFs, etc.)
+should be placed in the folder named "*/public/fcms/fcms_serve/*".
+You can then use those same assets using the following url format:
+
+    FCMS_url/fcms_serve/<file_name> 
+    or in this case
+    *example.com/fcms/fcms_serve/<file_name>*
+
+Remember that after adding any file to this or any directory,
+you must deploy again before you see the change on your website.
+
+**FYI:** You can change the name of the */fcms_serve/* directory, and thus its corresponding url,
+ at any time if you feel like you need to 
+(e.g. */public/fcms/someother_serve/* and *example.com/fcms/someother_serve/<file_name>*).
+Everything will probably be fine but, it is not recommended.
+
+### 7. Next Steps
+Your back-end setup is now complete. Mostly.
+
+Go to *FCMS_url/fcms_admin/*, or *example.com/fcms/fcms_admin/* in this case,
+to finish setting up and start designing your website. 
+
+#### FCMS URL Setting
+On this page, the most important setting is the "*FCMS url*" setting.
+
+Make sure you including the full url with the trailing slash (e.g. *https://example.com/fcms/*).
+Even if FCMS is installed at the root of your domain (e.g. *https://example.com/*).
+
+Again, you can use your Firebase-provided "*Hosting URL*" 
+if you have not yet connected a custom domain to your Firebase project.
+
+If you mess this up, your website **will be buggy or break** until you fix it.
+
+**FYI:** Because of the way Firebase hosting works, 
+all of the files in your FCMS directory are available publicly on the web, including this one.
+So, if you go to *FCMS_url/README.md* or *example.com/fcms/README.md* in this case,
+you will find this file. If that bothers you, just delete this README file, you're done with it anyway.
+For that matter, you can delete every file in this directory except for the following:
+
+    index.html
+    settings.js
+    fcms_admin/
+    fcms_serve/
+
+As long as you have those four files and folders, your website will run just fine. 
+However, you might want to keep the other templates in case you decide to change your template later on.
+FCMS is designed to allow you to easily change your template at any time.
+You will learn how to use templates on the *fcms_admin* page. 
+
+**Another FYI:** You can also change your FCMS directory location, and thus your FCMS url, 
+at any time if you feel like you need to
+(e.g. "*/public/somewhereelse/*" and "example.com/somewhereelse/").
+Again, chances are everything will be fine, but this is not recommended. 
+If you do this, make sure you update the "*FCMS url*" in your "*fcms_admin*" settings,
+otherwise your website **will break**. 
+ 
+
+Thanks for your time and have fun making your website.
 
 

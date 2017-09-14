@@ -1,0 +1,280 @@
+<!-- Written by Sam for fcms-->
+<!-- fcms_admin/index.html-->
+<!-- This page should help complete the installation process-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" 
+            integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <title>FCMS Admin</title>
+    <meta name="theme-color" content="#bd2031">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style>
+      h1, h2, h3, h4, h5, h6, t, p, body {
+          font-family: sans-serif;
+          text-align: center;
+          color: #101010;
+      }
+      h4, h5 { color: #282828; }
+      body { background-color: #f8f8f8; }
+      .step_1{
+      	padding-top: 200px;
+      	font-weight: 100;
+      }
+      
+      .step_2{
+      	padding-top: 10px;
+      	font-weight: 100;
+      }
+      #setup_div {
+          border: solid 1px #888;
+          border-radius: 3px;
+          background-color: white;
+          padding: 40px 10px;    
+          min-width: 80%;
+          width: fit-content;
+          margin: 40px auto;
+          box-shadow: 2px 2px 8px #202020;
+          
+      }
+      #setup_div h3 {
+          margin-top: 30px;
+      }
+      #setup_color_display {
+      	width: 60%;
+      	height: 100px;
+      	border: solid 1px #202020;
+      	margin: 10px auto 5px auto;
+      	background-color: #cb2031;
+      }
+      .step_2 input, .step_2 textarea {
+      	color: black;
+      	padding: 3px;
+      	padding-left: 7px;
+      	width: 60% !important;
+      	margin-left: auto;
+      	margin-right: auto;
+      	text-align: center;
+      }
+      #setup_tabs, #setup_enter {
+      	width: 60%;
+      	margin: 3px auto 10px auto;
+      }
+      .alert {
+        display: none;
+        position: fixed;
+        top: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+      }
+      
+      #signin_div {
+          border: solid 1px #888;
+          border-radius: 3px;
+          background-color: white;
+          padding: 10px;    
+          min-width: 50%;
+          width: fit-content;
+          margin: 40px auto;
+          box-shadow: 2px 2px 2px #202020;
+      }
+      #signin_email, #signin_pass, #signin_ok {
+          display: inline-block;
+          margin: 10px auto 0px auto;
+          width: 90%;
+          text-align: center;
+      }
+      
+      .btn {
+          min-width: 150px;
+      }
+      .btn:hover {
+          cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="step_1">WELCOME</h1>
+    
+    
+    <div style="display: none" class="not_ready">
+        <h3>settings.js file either either not found or "ready" set to "no"</h3>
+        <p>Please visit 
+            <a href="https://github.com/samvictor/FCMS#3-get-your-firebase-config-info">
+                github.com/samvictor/FCMS#3-get-your-firebase-config-info
+            </a> 
+            to set up your settings file.</p>
+    </div>
+    
+    
+    <div id="signin_div" class="sign_in" style="display: none;">
+        <h3 style="color: #113399;">Sign In</h3>
+        <input id="signin_email" placeholder="Email" class="form-control"></input>
+        <input id="signin_pass" placeholder="Password" class="form-control" type="password"></input>
+        <button id="signin_ok" type="button" class="btn btn-outline-success">SUBMIT</button>
+    </div>
+    
+    
+    <div id="setup_div" style="display: none" class="step_2">
+      <h3>Choose Your Site Name </h3>
+      <input id="setup_site_name" placeholder="Site Name" class="form-control">
+      <h3>Header Image Url</h3>
+      <h5>full path</h5>
+      <input id="setup_header_image" placeholder="https://example.com/fcms_serve/header_img.png" class="form-control">
+      <h3>Header Image Ratio</h3>
+      <h5>to prevent page popping (image width/image height)</h5>
+      <input id="setup_header_ratio" placeholder="2.54019" type="number">
+      <h3>Favicon Url</h3>
+      <h5>full path</h5>
+      <input id="setup_favicon" placeholder="https://example.com/fcms_serve/favicon_img.jpg" class="form-control">
+      <h3>Tabs </h3>
+      <h5>(leave blank for no tabs, semicolon ";" separated)</h5>
+      <textarea id="setup_tabs" class="form-control">Home; News; Contact Us</textarea>
+      <h3>Background Image</h3>
+      <h5>full path</h5>
+      <input id="setup_background_image" placeholder="https://example.com/fcms_serve/background_image.png" class="form-control">
+      <h3>Slideshow Images</h3>
+      <h5>(semicolon ";" separated)</h5>
+      <textarea id="setup_slideshow_images" 
+            placeholder="https://example.com/fcms_serve/image1.jpg; https://example.com/fcms_serve/image2.jpg; 
+                            https://example.com/fcms_serve/image_3.png" class="form-control"></textarea>
+      <h3>Choose Site Color </h3>
+      <h5>(hex rbg, include the hash)</h5>
+      <input id="setup_site_color" value="#cb2031" class="form-control">
+      <div id="setup_color_display"></div>
+      <h3>Enter URL for website</h3>
+      <h5>(Remember to include the trailing slash)</h5>
+      <input id="setup_root" class="form-control" placeholder="https://example.com/ or https://example.com/sub/"><br>
+      <button id="setup_enter" class="btn btn-success">Let's Go</button><br>
+    </div>
+    <div id="alert_success" role="alert" class="alert alert-success"></div>
+    <div id="alert_info" role="alert" class="alert alert-info"></div>
+    <div id="alert_warning" role="alert" class="alert alert-warning"></div>
+    <div id="alert_danger" role="alert" class="alert alert-danger"></div>
+    <div id="alert_danger_dismiss"class="alert alert-danger alert-dismissible fade show" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <t id="alert_danger_dismiss_text"></t>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" 
+        integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" 
+        integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+  </body>
+  <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
+  <script src="../settings.js"></script>
+  <script>
+    
+    // ================================== Initial Verifying =============================
+    $('.step_1').delay(500).animate({'padding-top': '20px'}, function(){
+        if (typeof settings === 'undefined') {
+            $('.not_ready').fadeIn();
+            return;
+        }
+        firebase.initializeApp(config);
+        
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                // User is signed in.
+                $('.sign_in').fadeOut(() => {
+                    $('.step_2').fadeIn(); 
+                });
+
+            } else {
+                // User is signed out.
+                $('.step_2').fadeOut(() => {
+                    $('.sign_in').fadeIn();                
+                });
+                /*var provider = new firebase.auth.GoogleAuthProvider();
+                firebase.auth().signInWithPopup(provider).then(function(result) {
+                  // This gives you a Google Access Token. You can use it to access the Google API.
+                  var token = result.credential.accessToken;
+                  // The signed-in user info.
+                  var user = result.user;
+                  // ...
+                }).catch(function(error) {
+                  // Handle Errors here.
+                  var errorCode = error.code;
+                  var errorMessage = error.message;
+                  // The email of the user's account used.
+                  var email = error.email;
+                  // The firebase.auth.AuthCredential type that was used.
+                  var credential = error.credential;
+                  // ...
+          
+                  console.log('Auth failed. code: ', errorCode);
+                  console.log('message: ', errorMessage);
+                  
+                  if (errorCode === 'auth/popup-blocked') {
+                      $('#alert_danger').text('Sign in popup blocked. Please allow popups on this page.');
+                      $('#alert_danger').fadeIn().delay(5000).fadeOut();
+                      return;
+                  }
+                    
+                  
+                  $('#alert_danger').text('Sign in failed. Setup an Admin user in your Firebase console.');
+                  $('#alert_danger').fadeIn().delay(5000).fadeOut();
+                });*/
+            }
+        });
+    });
+    
+    
+    $('#signin_ok').on('click', function () {
+        firebase.auth().signInWithEmailAndPassword (
+                        $('#signin_email').val(), 
+                        $('#signin_pass').val())
+        .catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          
+          console.log('Auth failed. code: ', errorCode);
+          console.log('message: ', errorMessage);
+          
+          $('#alert_danger').text('Sign in failed. Setup an Admin user in your Firebase console.');
+          $('#alert_danger').fadeIn().delay(5000).fadeOut();
+          // ...
+        });
+    });
+    
+    
+    $('#setup_site_color').on('keyup', function () {
+    	$('#setup_color_display').css('background-color', this.value);
+    	console.log('changing color');
+    });
+    function submit() {
+    	$('#alert_info').text('Working...').fadeIn().delay(1000).fadeOut();
+      let to_post = { 'site': $('#site_name').val(), 'tabs': $('#tabs').val(),
+    	                'color': $('#site_color').val(), 'password': $('#password').val(),
+    	                'header_image': $('#header_image').val(), 'header_ratio': $('#header_ratio').val(),
+    	                'favicon': $('#favicon').val(), 'background_image': $('#background_image').val(),
+    	                'slideshow_images': $('#slideshow_images').val()};
+    	$.post( document.URL, to_post)
+            .done(function( data ) {
+                data = data.split(':');
+                data[1] = data[1].trim();
+                if (data[0] === 'thumbs up') {
+                  $('#alert_success').text(data[1]).fadeIn().delay(2400).fadeOut();
+                  location.reload(true);
+                }
+                else {
+                  $('#alert_danger').text(data[1]).fadeIn().delay(2400).fadeOut();
+                }
+            });
+    }
+    $('#enter').on('click', submit);
+    $('#password').on('keypress', function(e){
+    	if(e.which === 13) {
+          submit();
+      }
+    });
+    $('textarea').autoResize();
+  </script>
+</html>

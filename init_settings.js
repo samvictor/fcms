@@ -1,6 +1,5 @@
 settings = {
-	"ready": "no", 
-	"email": "", 
-	"password": "", 
-	"root": ""
 };
+
+
+// paste var config = {...}; here
