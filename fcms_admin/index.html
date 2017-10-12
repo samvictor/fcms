@@ -674,12 +674,11 @@
         function clean_make_url (str) {
           return str
             .replace(/&/g, '&amp;')
-            .replace(/\?/g, '&#63;')
             .replace(/>/g, '&gt;')
             .replace(/</g, '&lt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&apos;')
-            .replace(/\s/g, '')
+            .replace(/\s|\?|\.|\#|\$|\[|\]/g, '')
             .toLowerCase();
         }
         function clean_url (str) {
