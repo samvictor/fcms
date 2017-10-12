@@ -405,6 +405,10 @@
                     console.log("do_assign push state. push_state is", push_state);
                 }
                 let new_url = assignment_data.toLowerCase();
+                
+                if (new_url === '')
+                	new_url = page_data['default_url'];
+                	
                 curr_url = new_url;
                 firebase.database().ref('/fcms_data/pages/'+new_url).once('value', function(snapshot){
                     let page = snapshot.val();

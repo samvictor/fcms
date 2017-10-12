@@ -57,6 +57,9 @@ Finally edit your */firebase.json* file to look like this:
     "public": "public",    
     "rewrites": [
       {
+        "source": "/fcms/**/settings.js", "destination": "/fcms/settings.js"
+      },
+      {
         "source": "/fcms/**", "destination": "/fcms/index.html"
       }
     ]
@@ -64,6 +67,10 @@ Finally edit your */firebase.json* file to look like this:
 }
 
 ```
+
+You can replace "/fcms/" with your own root. 
+Also, because earlier "rewrites" entries have higher precedence, 
+the order is important here.
 
 ### 3. Get your Firebase Config Info
 Once you've created your Firebase account, go to the *Overview* tab in your Firebase console.
