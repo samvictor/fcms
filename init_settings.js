@@ -1,4 +1,5 @@
 settings = {
+    'tab_title': ''
 };
 
 

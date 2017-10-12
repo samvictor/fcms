@@ -38,6 +38,8 @@
       h1, h2, h3 {
           color: #202020;
           text-align: center;
+      	  font-weight: 200;
+      	  font-family: 'Raleway', sans-serif;
       }
       #site_title {
       	font-family: 'Raleway', sans-serif;
@@ -213,6 +215,7 @@
         $('#loading_div').fadeOut();
     }
     
+    document.title = settings['tab_title']; 
     firebase.initializeApp(config);
     // ============================ SCRIPT ===============================
     function show_loading() {
@@ -243,10 +246,8 @@
     load_loop();
     // ============================= FIRST PAGE LOAD ==========================
     let page_data = null;
-    firebase.database().ref('/fcms_data/pages').once('value', function(snapshot){
+    firebase.database().ref('fcms_data/gen_site_data').on('value', function(snapshot) {
             page_data = snapshot.val();
-            page_data['site_title'] = page_data['site_name'];
-            page_data['root'] = page_data['root'];
             //$.post( document.URL)
             //    .done(function( data ) {
             //        page_data = JSON.parse(data);
@@ -263,81 +264,98 @@
                 // root not found in url so url at root with not ending in slash, or nothing after root,
                 // go home (aka first tab)
                 // we need content, title, and url
-                page_data['id'] = page_data['site_tabs'][0]['id'];
-                temp_page = page_data['page_content'][page_data['id']];
-                page_data['page_title'] = temp_page['name'];
-                page_data['page_content'] = temp_page['content'];
-                page_data['url'] = temp_page['url'];
+                let temp_url = page_data['default_url'];
+                
+                firebase.database().ref('fcms_data/pages/' + temp_url).on('value', function(snap2) {
+                    temp_page = snap2.val(); 
+                    page_data['page_title'] = temp_page['name'];
+                    page_data['page_content'] = temp_page['content'];
+                    display_page();
+                });
             }
             else {
                 // we need content, title, and url
-                page_data['page_content'].forEach(function(temp_page){
-                    if (temp_page['url'] !== page_data['url'])
-                        return;
-                    page_data['page_title'] = temp_page['name'];
-                    page_data['page_content'] = temp_page['content'];
-                    page_found = true;
+                firebase.database().ref('fcms_data/pages/' + page_data['url']).on('value', function(snap2) {
+                    temp_page = snap2.val();
+                    if (temp_page === null) {
+                        // 404
+                        page_data['page_title'] = '404';
+                        page_data['page_content'] = '<h2>Page Not Found</h2>';
+                        display_page();
+                    }
+                    else {
+                        page_data['page_title'] = temp_page['name'];
+                        page_data['page_content'] = temp_page['content'];
+                        display_page();
+                    }
                 });
-                if (!page_found) {
-                    // 404
-                    page_data['page_title'] = '404';
-                    page_data['page_content'] = '<h2>Page Not Found</h2>';
-                }
+                
             }
+        }, function(error){
+            console.log(error);
+        });
+        
+        function display_page() {        
             // First Page Draw - page_data is now read-only
             $('#page_title').text(page_data['page_title'].toUpperCase());
             $('#page_content').html(page_data['page_content']);
+            
             // replace state
             history.replaceState (
                 {'page_data': page_data, 'new_url': page_data['url']},
-                page_data['page_title'] + ' - ' + page_data['site_title'],
+                page_data['page_title'] + ' - ' + page_data['name'],
                 page_data['root'] + page_data['url']
             );
             console.log('first draw replace state');
             curr_url = page_data['url'];
-            if (page_data['background_image'] !== '' && page_data['background_image']['url'] !== '') {
-                $('body').css('background', 'url('+page_data['background_image']['url']+') no-repeat')
+            if (page_data['background_img']['url'] !== '' && page_data['background_img']['url'] !== '') {
+                $('body').css('background', 'url('+page_data['background_img']['url']+') no-repeat')
                     .css('background-size', 'cover').css('background-attachment', 'fixed');
             }
             let slideshow_html = '';
-            let slideshow_images = page_data['slideshow_images'];
+            let slideshow_images = page_data['slideshow'];
             if (slideshow_images === undefined) {
                 slideshow_images = [];
                 $('#slideshow').css('display', 'none');
+            }
+            else {
+                slideshow_images = page_data['slideshow']['imgs'];
             }
             for(let i = 0; i < slideshow_images.length; i++){
             	if (i === 0)
                     slideshow_html += '<div class="item active" >';
                 else
                     slideshow_html += '<div class="item" >';
-            	slideshow_html +=     '<img alt="carousel image" src="'+ slideshow_images[i] +'" class="slideshow_image" />';
+            	slideshow_html +=     '<img alt="carousel image" src="'+ slideshow_images[i]['url'] +'" class="slideshow_image" />';
             	slideshow_html += '</div> ';
             }
             $('#carousel_inner').append(slideshow_html);
-            if (page_data['header_image']['url'] !== '') {
+            if (page_data['header_img']['url'] !== '') {
                 $('#site_title').css('display', 'none');
-                $('#header_image').css('display', 'block').attr('src', page_data['header_image']['url']);
-                if (page_data['header_image']['ratio'] !== '')
-                    $('#header_image').attr('ratio', page_data['header_image']['ratio'])
+                $('#header_image').css('display', 'block').attr('src', page_data['header_img']['url']);
+                if (page_data['header_img']['ratio'] !== '')
+                    $('#header_image').attr('ratio', page_data['header_img']['ratio'])
             }
             else
-                $('#site_title').text(page_data['site_title']);//.css('color', page_data['site_color']);
+                $('#site_title').text(page_data['name']);//.css('color', page_data['site_color']);
             // JQuery CSS
             //$('a').css('color', page_data['site_color']);
             let jq_css = '<style id="jq_css"> ';
-            jq_css +=         'a, a:hover, #site_title, .color, h1, h2, h3 { color: '+ page_data['site_color'] +'; } ';
-            jq_css +=         '.tab.active { background-color: '+ page_data['site_color'] +'; } ';
+            jq_css +=         'a, a:hover, #site_title, .color, h1, h2, h3 { color: '+ page_data['color'] +'; } ';
+            jq_css +=         '.tab.active { background-color: '+ page_data['color'] +'; } ';
             jq_css +=    '</style>';
             $('head').append(jq_css);
             // TABS
             let tabs_html = '';
-            page_data['site_tabs'].forEach(function(tab){
+            let tab = null;
+            for(let key in page_data['tabs_ordered']) {
+                tab = page_data['tabs_ordered'][key];
                 tabs_html += '<div id="'+tab['url']+'_tab" class="tab ';
-                if (tab['url'] === page_data['url'])
+                if (tab['url'] === page_data['url'] || page_data['url'] === '' && tab['url'] === page_data['default_url'])
                     tabs_html += 'active';
                 tabs_html += '" href='+tab['url']+'>'+ tab['name'].toUpperCase() + '</div>';
-            });
-            $('#tab_bar').append(tabs_html);
+            }
+            $('#tab_bar').html(tabs_html);
             //$('.tab.active').css('background-color', page_data['site_color']);
             // prevent page popping
             $('img').each(function(){
@@ -348,16 +366,14 @@
             });
             $('#loading_div').fadeOut();
             loading = false;
-            document.title = page_data['page_title'] + ' - ' + page_data['site_title'];
+            document.title = page_data['page_title'] + ' - ' + page_data['name'];
             $('.tab').each(function(){
                 $(this).on('click', function(){
                 	do_assignment('page', $(this).attr('href'));
                 });
             });
-            $('head').append('<link rel="icon" href="'+page_data['favicon_image']['url']+'">');
-    }, function (error) {
-        console.log(error);
-    });
+            $('head').append('<link rel="icon" href="'+page_data['favicon_url']+'">');
+    }
     // Prevent page popping
     $(window).resize(function(){
         $('img').each(function(){
@@ -383,17 +399,10 @@
                     console.log("do_assign push state. push_state is", push_state);
                 }
                 let new_url = assignment_data.toLowerCase();
-                let base_url = document.URL.substring(0, document.URL.lastIndexOf(page_data['path']));
-                if (base_url[ base_url.length -1 ] !== '/')
-                    base_url += '/';
                 curr_url = new_url;
-                firebase.database().ref('/fcms_data/pages/page_content').once('value', function(snapshot){
-                    let data = snapshot.val();
-                    let found = false;
-                    data.forEach(function(page){
-                        if (found || page['url'] !== new_url)
-                            return;
-                        found = true;
+                firebase.database().ref('/fcms_data/pages/'+new_url).once('value', function(snapshot){
+                    let page = snapshot.val();
+                    if (page !== null) {
                         $('#page_title').text(page['name'].toUpperCase());
                         $('#page_content').html(page['content']);
                         //$('a').css('color', page_data['site_color']);
@@ -402,14 +411,14 @@
                         $('.tab.active').removeClass('active');
                         $('#'+new_url+'_tab').addClass('active');
                         //setTimeout(() => $('.tab.active').css('background-color', page_data['site_color']), 100);
-                        document.title = page['name'] + ' - ' + page_data['site_title'];
+                        document.title = page['name'] + ' - ' + page_data['name'];
                         if (push_state) {
                             history.replaceState({'page_data': page_data, 'new_url': new_url}, 
                                                     page_data['page_title'], page_data['root']+new_url);
                             console.log("do_assign replace state. push_state is", push_state);
                         }
-                    });
-                    if (!found) {
+                    }
+                    else {
                         $('#page_title').text('404');
                         $('#page_content').text('Page Not Found');
                         //$('#loading_div').fadeOut(200);
@@ -423,17 +432,6 @@
                         }
                     }
                 });
-                /*$.post( base_url+ new_url)
-                  .done(function( data ) {
-                    page_data = JSON.parse(data);
-                    $('#page_title').text(page_data['page_title'].toUpperCase());
-                    $('#page_content').text(page_data['page_content']);
-                    $('#loading_div').fadeOut();
-                    loading = false;
-                    document.title = page_data['site_title'] + ' - ' + page_data['page_title'];
-                    if (push_state)
-                        history.pushState({'page_data': page_data}, page_data['page_title'], page_data['root']+new_url);
-                  });*/
             break;
         }
     }

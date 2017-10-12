@@ -61,10 +61,15 @@ Now go back into the FCMS
 Copy the piece of code that sets the `config` variable.
 
 Open the */public/fcms/settings.js* file again paste the code into that settings file. 
+
+While you're here, also set the *"tab_title"* variable. 
+This will be the title that shows up in browser tabs.
+
 When you're done, you should have a */public/fcms/settings.js* file that looks like this:
 
 ```
 settings = {
+    'tab_title': 'My Site'
 };
 
 // Initialize Firebase
@@ -243,9 +248,13 @@ When you hit your FCMS url, you should see a loading screen that never ends.
 This is expected.
 
 If you haven't yet connected a custom domain to your project, 
-you can use the one provided automatically by Firebase. 
-You can find this domain in the console print-out after you deploy. 
+you can use the one provided automatically by Firebase, 
+but please remember to change it in your fcms_admin settings when you do connect a custom domain.
+If you don't know what fcms_admin is yet, don't worry, I'll explain it later.
+ 
+You can find your Firebase-provided domain in the console print-out after you deploy. 
 It will be named "*Hosting URL:*". 
+
 If your hosting url is `https://<proj-id>.firebaseapp.com`, 
 and your FCMS directory is "*/public/fcms/*",
 then your FCMS url is `https://<proj-id>.firebaseapp.com/fcms/`
@@ -282,8 +291,12 @@ On this page, the most important setting is the "*FCMS url*" setting.
 Make sure you including the full url with the trailing slash (e.g. *https://example.com/fcms/*).
 Even if FCMS is installed at the root of your domain (e.g. *https://example.com/*).
 
+Make sure you also include the "https://" at the beginning. Notice that you don't need the "www." 
+if your domain is a "naked domain", however you can include it if you want to.
+
 Again, you can use your Firebase-provided "*Hosting URL*" 
-if you have not yet connected a custom domain to your Firebase project.
+if you have not yet connected a custom domain to your Firebase project,
+but remember to change it later when you have connected a custom domain.
 
 If you mess this up, your website **will be buggy or break** until you fix it.
 

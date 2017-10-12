@@ -27,19 +27,16 @@
       	background-color: #f2f2f2;
       	/*background: linear-gradient(to bottom, #404040 0%,  #404040 70%, #101010 80%, #101010 100%);*/
       }
-      h1, h2, h3, h4, h5, h6, t, p, body {
-          font-family: sans-serif;
-      }
-      body, p, t {
+      body, p, t, h4, h5, h6 {
           font-family: 'assistant', sans-serif;
       	font-size: 18px;
           line-height: 28px;
       }
       h1, h2, h3 {
       	color: #202020;
-          text-align: center;
+        text-align: center;
       	font-family: 'Raleway', sans-serif;
-      	font-weight: 500;
+      	font-weight: 200;
       }
       #title_holder{
           background: rgba(20, 20, 20, 0.2);
@@ -225,23 +222,23 @@
         integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
   </body>
   <script src="https://www.gstatic.com/firebasejs/4.2.0/firebase.js"></script>
+  <script src="settings.js"></script>
   <script>
-    // Initialize Firebase
-    var config = {
-      apiKey: '{apiKey}',
-      authDomain: '{authDomain}',
-      databaseURL: '',
-      projectId: ''
-    };
+    if (typeof settings === 'undefined') {
+        $('.not_ready').css('display', 'block');
+        $('#loading_div').fadeOut();
+    }
+    
+    document.title = settings['tab_title']; 
     firebase.initializeApp(config);
-  </script>
-  <script>
     // ============================ SCRIPT ===============================
+    "use strict";
+    
     function show_loading() {
     	  load_i++;
           switch (load_i % 4) {
             case 0:
-              load_text.text('Loading');
+              load_text.text('Loading ');
               break;
             case 1:
               load_text.text('Loading .');
@@ -263,12 +260,13 @@
     var load_i = 0;
     var load_text = $('#load_text');
     load_loop();
+    
     // ============================= FIRST PAGE LOAD ==========================
     let page_data = null;
-    firebase.database().ref('/scms_data/info_page_content').once('value', function(snapshot){
+    firebase.database().ref('/fcms_data/info_page_content').once('value', function(snapshot){
             page_data = snapshot.val();
             page_data['site_title'] = page_data['site_name'];
-            page_data['root'] = '[object global]';
+            page_data['root'] = '';
             //$.post( document.URL)
             //    .done(function( data ) {
             //        page_data = JSON.parse(data);
@@ -391,7 +389,7 @@
                 let base_url = document.URL.substring(0, document.URL.lastIndexOf(page_data['path']));
                 if (base_url[ base_url.length -1 ] !== '/')
                     base_url += '/';
-                firebase.database().ref('/scms_data/info_page_content/page_content').once('value', function(snapshot){
+                firebase.database().ref('/fcms_data/info_page_content/page_content').once('value', function(snapshot){
                     let data = snapshot.val();
                     let found = false;
                     data.forEach(function(page){

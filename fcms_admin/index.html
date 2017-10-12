@@ -26,7 +26,8 @@
       }
       
       .step_2{
-      	padding-top: 10px;
+      	padding: 10px;
+      	padding-top: 30px;
       	font-weight: 100;
       }
       #setup_div {
@@ -40,8 +41,11 @@
           box-shadow: 2px 2px 8px #202020;
           
       }
-      #setup_div h3 {
-          margin-top: 30px;
+      #setup_div h5 {
+          margin-top: 10px;
+      }
+      #setup_div t {
+          color: #505050;
       }
       #setup_color_display {
       	width: 60%;
@@ -70,13 +74,19 @@
         left: 50%;
         transform: translateX(-50%);
         width: 80%;
+        z-index: 1040;
+      }
+      .valid-feedback {
+          opacity: 0.0;
+          transition: opacity 0.5s;
+          color: #d9534f;
       }
       
       #signin_div {
           border: solid 1px #888;
           border-radius: 3px;
           background-color: white;
-          padding: 10px;    
+          padding: 30px 10px 45px 10px;    
           min-width: 50%;
           width: fit-content;
           margin: 40px auto;
@@ -95,6 +105,43 @@
       .btn:hover {
           cursor: pointer;
       }
+      
+      /* ======================= MAIN ==================*/
+      #main_div {
+          padding: 5%;
+      	  padding-top: 0px;
+      }
+      #main_div .valid-feedback {
+          opacity: 1;
+          transition: opacity 0.5s;
+          display: none;
+          color: #d9534f;
+      }
+      #main_div input, #main_div textarea {
+      	color: black;
+      	margin: auto;
+      	margin-right: auto;
+      	text-align: center;
+      }
+      #main_div h5 {
+      	margin-top: 30px;
+      }
+      #color_display {
+      	height: 100px;
+      	border: solid 1px #202020;
+      	margin: 10px auto 5px auto;
+      	background-color: #cb2031;
+      }
+      
+      .nav-link {
+          transition: color 0.3s;
+      }
+      a.navbar-brand { color: white !important; }
+      .nav-link, .navbar-brand {
+          cursor: pointer;
+      }
+      
+      
     </style>
   </head>
   <body>
@@ -120,46 +167,198 @@
     
     
     <div id="setup_div" style="display: none" class="step_2">
-      <h3>Choose Your Site Name </h3>
-      <input id="setup_site_name" placeholder="Site Name" class="form-control">
-      <h3>Header Image Url</h3>
-      <h5>full path</h5>
-      <input id="setup_header_image" placeholder="https://example.com/fcms_serve/header_img.png" class="form-control">
-      <h3>Header Image Ratio</h3>
-      <h5>to prevent page popping (image width/image height)</h5>
-      <input id="setup_header_ratio" placeholder="2.54019" type="number">
-      <h3>Favicon Url</h3>
-      <h5>full path</h5>
-      <input id="setup_favicon" placeholder="https://example.com/fcms_serve/favicon_img.jpg" class="form-control">
-      <h3>Tabs </h3>
-      <h5>(leave blank for no tabs, semicolon ";" separated)</h5>
-      <textarea id="setup_tabs" class="form-control">Home; News; Contact Us</textarea>
-      <h3>Background Image</h3>
-      <h5>full path</h5>
-      <input id="setup_background_image" placeholder="https://example.com/fcms_serve/background_image.png" class="form-control">
-      <h3>Slideshow Images</h3>
-      <h5>(semicolon ";" separated)</h5>
+      <h5>Choose Your Site Name</h5>
+      <input id="setup_site_name" placeholder="Site Name" class="form-control validate_me validate_notblank">
+      <div id="setup_site_name_feedback" class="valid-feedback">
+        Please provide a Site Name.
+      </div><br>
+      
+      <h5>Header Image URL</h5>
+      <t>full path</t>
+      <input id="setup_header_image" placeholder="https://example.com/fcms_serve/header_img.png" class="form-control validate_me validate_http">
+      <div id="setup_header_image_feedback" class="valid-feedback">
+        Please provide a valid Header Image URL or leave this form blank.<br>
+        Remember to include the "https://" at the beginning (e.g. https://example.com/fcms_serve/header_img.png)
+      </div>
+      
+      <h5>Header Image Ratio</h5>
+      <t>to prevent page popping (image width/image height)</t>
+      <input id="setup_header_ratio" placeholder="2.54019" type="number" class="form-control validate_me validate_none">
+      <div id="setup_header_ratio_feedback" class="valid-feedback">
+        Please provide a valid Header Image Ratio or leave this form blank.<br>
+        Must be a number (e.g. 2.54019)
+      </div>
+      
+      <h5>Favicon Url</h5>
+      <t>full path</t>
+      <input id="setup_favicon" placeholder="https://example.com/fcms_serve/favicon_img.jpg" class="form-control validate_me validate_http">
+      <div id="setup_favicon_feedback" class="valid-feedback">
+        Please provide a valid Favicon URL or leave this form blank.<br>
+        Remember to include the "https://" at the beginning (e.g. https://example.com/fcms_serve/favicon_img.jpg)
+      </div>
+      
+      <h5>Tabs </h5>
+      <t>(leave blank for no tabs, semicolon ";" separated)</t>
+      <textarea id="setup_tabs" class="form-control validate_me validate_none">Home; News; Contact Us</textarea>
+      <div id="setup_tabs_feedback" class="valid-feedback">
+        Please provide a valid set of Tabs or leave this form blank.<br>
+        (e.g. Home; News; Contact Us)
+      </div>
+      
+      <h5>Background Image</h5>
+      <t>full path</t>
+      <input id="setup_background_image" placeholder="https://example.com/fcms_serve/background_image.png" 
+            class="form-control validate_me validate_http">
+      <div id="setup_background_image_feedback" class="valid-feedback">
+        Please provide a valid Background Image or leave this form blank.<br>
+        Remember to include the "https://" at the beginning (e.g. https://example.com/fcms_serve/background_image.jpg)
+      </div>
+      
+      <h5>Slideshow Images</h5>
+      <t>(semicolon ";" separated)</t>
       <textarea id="setup_slideshow_images" 
-            placeholder="https://example.com/fcms_serve/image1.jpg; https://example.com/fcms_serve/image2.jpg; 
-                            https://example.com/fcms_serve/image_3.png" class="form-control"></textarea>
-      <h3>Choose Site Color </h3>
-      <h5>(hex rbg, include the hash)</h5>
-      <input id="setup_site_color" value="#cb2031" class="form-control">
+        placeholder="https://example.com/fcms_serve/image1.jpg; https://example.com/fcms_serve/image2.jpg; https://example.com/fcms_serve/image_3.png" 
+        class="form-control validate_me validate_http"></textarea>
+      <div id="setup_slideshow_images_feedback" class="valid-feedback">
+        Please provide a valid set of Slideshow Images or leave this form blank.<br>
+        Remember to include the "https://" at the beginning of each URL
+      </div>
+      
+      <h5>Choose Site Color </h5>
+      <t>(hex rbg, include the hash)</t>
+      <input id="setup_site_color" value="#cb2031" class="form-control validate_me validate_color validate_notblank">
       <div id="setup_color_display"></div>
-      <h3>Enter URL for website</h3>
-      <h5>(Remember to include the trailing slash)</h5>
-      <input id="setup_root" class="form-control" placeholder="https://example.com/ or https://example.com/sub/"><br>
-      <button id="setup_enter" class="btn btn-success">Let's Go</button><br>
+      <div id="setup_site_color_feedback" class="valid-feedback">
+        Please provide a valid Site Color.<br>
+        (e.g. #cb2031)
+      </div>
+      
+      <h5>Enter FCMS URL for Website</h5>
+      <t>If you don't know what that is, find our here: <br>
+        <a href="https://github.com/samvictor/FCMS#5-hit-the-site">github.com/samvictor/FCMS#5-hit-the-site</a> or 
+        <a href="https://github.com/samvictor/FCMS#fcms-url-setting">https://github.com/samvictor/FCMS#fcms-url-setting</a>
+      </t><br>
+      <t>(Remember to include the "https://" and the trailing slash)</t>
+      <input id="setup_root" class="form-control validate_me validate_root validate_notblank" 
+            placeholder="https://example.com/ or https://example.com/sub/">
+      <div id="setup_root_feedback" class="valid-feedback">
+        Please provide a valid FCMS URL.<br>
+        This is the root of your FCMS website. It is where the user's index.html is.
+      </div>
+      
+      <button id="setup_enter" class="btn btn-outline-success">Let's Go</button><br>
     </div>
+    
+    <!-- ==================================== MAIN DIV ====================================================== -->
+    <div id="main_div" style="display:none" class="step_3">
+      <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+          <a class="navbar-brand site_name go_home"></a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" 
+                    data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
+                    aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+              <li id="gen_tab" class="nav-item active">
+                <a class="nav-link">General<span class="sr-only">current</span></a>
+              </li>
+              <li id="tabs_tab" class="nav-item">
+                <a class="nav-link">Tabs & Pages</a>
+              </li>
+            </ul>
+            
+            <button class="btn btn-outline-danger my-2 my-sm-0">Logout</button>
+          </div>
+      </nav>
+      
+      <div style="height: 60px;"></div> 
+        
+      <h5>Site Name</h5>
+      <input id="site_name" placeholder="Site Name" class="form-control validate_me3 validate_notblank3">
+      <div id="site_name_feedback" class="valid-feedback">
+        Please provide a Site Name.
+      </div>
+      
+      <h5>Header Image URL</h5>
+      <t>full path</t>
+      <input id="header_image" placeholder="https://example.com/fcms_serve/header_img.png" class="form-control validate_me3 validate_http3">
+      <div id="header_image_feedback" class="valid-feedback">
+        Please provide a valid Header Image URL or leave this form blank.<br>
+        Remember to include the "https://" at the beginning (e.g. https://example.com/fcms_serve/header_img.png)
+      </div>
+      
+      <h5>Header Image Ratio</h5>
+      <t>to prevent page popping (image width/image height)</t>
+      <input id="header_ratio" placeholder="2.54019" type="number" class="form-control validate_me3 validate_none3">
+      <div id="header_ratio_feedback" class="valid-feedback">
+        Please provide a valid Header Image Ratio or leave this form blank.<br>
+        Must be a number (e.g. 2.54019)
+      </div>
+      
+      <h5>Favicon Url</h5>
+      <t>full path</t>
+      <input id="favicon" placeholder="https://example.com/fcms_serve/favicon_img.jpg" class="form-control validate_me3 validate_http3">
+      <div id="favicon_feedback" class="valid-feedback">
+        Please provide a valid Favicon URL or leave this form blank.<br>
+        Remember to include the "https://" at the beginning (e.g. https://example.com/fcms_serve/favicon_img.jpg)
+      </div>
+      
+      <h5>Background Image</h5>
+      <t>full path</t>
+      <input id="background_image" placeholder="https://example.com/fcms_serve/background_image.png" 
+            class="form-control validate_me3 validate_http3">
+      <div id="background_image_feedback" class="valid-feedback">
+        Please provide a valid Background Image or leave this form blank.<br>
+        Remember to include the "https://" at the beginning (e.g. https://example.com/fcms_serve/background_image.jpg)
+      </div>
+      
+      <h5>Slideshow Images</h5>
+      <t>(semicolon ";" separated)</t>
+      <textarea id="slideshow_images" 
+        placeholder="https://example.com/fcms_serve/image1.jpg; https://example.com/fcms_serve/image2.jpg; https://example.com/fcms_serve/image_3.png" 
+        class="form-control validate_me3 validate_http3"></textarea>
+      <div id="slideshow_images_feedback" class="valid-feedback">
+        Please provide a valid set of Slideshow Images or leave this form blank.<br>
+        Remember to include the "https://" at the beginning of each URL
+      </div>
+      
+      <h5>Site Color </h5>
+      <t>(hex rbg, include the hash)</t>
+      <input id="site_color" value="#cb2031" class="form-control validate_me3 validate_color3 validate_notblank3">
+      <div id="color_display"></div>
+      <div id="site_color_feedback" class="valid-feedback">
+        Please provide a valid Site Color.<br>
+        (e.g. #cb2031)
+      </div>
+      
+      <h5>FCMS URL for Website</h5>
+      <t>If you don't know what that is, find our here: <br>
+        <a href="https://github.com/samvictor/FCMS#5-hit-the-site">github.com/samvictor/FCMS#5-hit-the-site</a> or 
+        <a href="https://github.com/samvictor/FCMS#fcms-url-setting">https://github.com/samvictor/FCMS#fcms-url-setting</a>
+      </t><br>
+      <t>(Remember to include the "https://" and the trailing slash)</t>
+      <input id="root" class="form-control validate_me3 validate_root3 validate_notblank3" 
+            placeholder="https://example.com/ or https://example.com/sub/">
+      <div id="root_feedback" class="valid-feedback">
+        Please provide a valid FCMS URL.<br>
+        This is the root of your FCMS website. It is where the user's index.html is.
+      </div><br>
+      
+      <button id="save" class="btn btn-outline-success">Save</button><br>
+    </div>
+    
+    
     <div id="alert_success" role="alert" class="alert alert-success"></div>
     <div id="alert_info" role="alert" class="alert alert-info"></div>
     <div id="alert_warning" role="alert" class="alert alert-warning"></div>
     <div id="alert_danger" role="alert" class="alert alert-danger"></div>
     <div id="alert_danger_dismiss"class="alert alert-danger alert-dismissible fade show" role="alert">
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
+        <span aria-hidden="true" class="">&times;</span>
       </button>
-      <t id="alert_danger_dismiss_text"></t>
+      <t class="" id="alert_danger_dismiss_text"></t>
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" 
@@ -170,26 +369,49 @@
   <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
   <script src="../settings.js"></script>
   <script>
+    "use strict";
     
     // ================================== Initial Verifying =============================
-    $('.step_1').delay(500).animate({'padding-top': '20px'}, function(){
-        if (typeof settings === 'undefined') {
-            $('.not_ready').fadeIn();
-            return;
-        }
+    if (typeof settings === 'undefined') {
+        $('.not_ready').fadeIn();
+    }
+    else {
         firebase.initializeApp(config);
         
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
                 // User is signed in.
                 $('.sign_in').fadeOut(() => {
-                    $('.step_2').fadeIn(); 
+                    firebase.database().ref('fcms_data/gen_site_data/setup_complete').once('value')
+                        .then(function(snap){
+                            if(snap.val() === 'yes') {
+                                $('.step_1').animate({'margin-top': '-250px', 'opacity': '0'}, 'easein')
+                                    .fadeOut(0);
+                                $('.step_3').fadeIn(); 
+                                do_assignment('general');
+                            }
+                            else {
+                                $('.step_1').delay(500).animate({'padding-top': '20px'}, function(){
+                                    $('.step_2').fadeIn();
+                                });
+                            }
+    
+                        }, 
+                        function(error){
+                            $('.step_1').delay(500).animate({'padding-top': '20px'});
+    
+                            $('#alert_danger').text('Connection Error: '+ error.message);
+                            $('#alert_danger').fadeIn().delay(10000).fadeOut();
+                        });
                 });
-
+    
             } else {
                 // User is signed out.
-                $('.step_2').fadeOut(() => {
-                    $('.sign_in').fadeIn();                
+                $('.step_2').fadeOut();
+                $('.step_3').fadeOut(() => {
+                    $('.step_1').delay(500).animate({'padding-top': '20px'}, function(){
+                        $('.sign_in').fadeIn();                
+                    });
                 });
                 /*var provider = new firebase.auth.GoogleAuthProvider();
                 firebase.auth().signInWithPopup(provider).then(function(result) {
@@ -223,58 +445,500 @@
                 });*/
             }
         });
-    });
-    
-    
-    $('#signin_ok').on('click', function () {
-        firebase.auth().signInWithEmailAndPassword (
-                        $('#signin_email').val(), 
-                        $('#signin_pass').val())
-        .catch(function(error) {
-          // Handle Errors here.
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          
-          console.log('Auth failed. code: ', errorCode);
-          console.log('message: ', errorMessage);
-          
-          $('#alert_danger').text('Sign in failed. Setup an Admin user in your Firebase console.');
-          $('#alert_danger').fadeIn().delay(5000).fadeOut();
-          // ...
+        
+        
+        $('#signin_pass').on('keypress', function(e){
+        	if(e.which === 13) {
+              signin_submit();
+          }
         });
-    });
-    
-    
-    $('#setup_site_color').on('keyup', function () {
-    	$('#setup_color_display').css('background-color', this.value);
-    	console.log('changing color');
-    });
-    function submit() {
-    	$('#alert_info').text('Working...').fadeIn().delay(1000).fadeOut();
-      let to_post = { 'site': $('#site_name').val(), 'tabs': $('#tabs').val(),
-    	                'color': $('#site_color').val(), 'password': $('#password').val(),
-    	                'header_image': $('#header_image').val(), 'header_ratio': $('#header_ratio').val(),
-    	                'favicon': $('#favicon').val(), 'background_image': $('#background_image').val(),
-    	                'slideshow_images': $('#slideshow_images').val()};
-    	$.post( document.URL, to_post)
-            .done(function( data ) {
-                data = data.split(':');
-                data[1] = data[1].trim();
-                if (data[0] === 'thumbs up') {
-                  $('#alert_success').text(data[1]).fadeIn().delay(2400).fadeOut();
-                  location.reload(true);
+        $('#signin_ok').on('click', signin_submit);
+        
+        function signin_submit() {
+            firebase.auth().signInWithEmailAndPassword (
+                            $('#signin_email').val(), 
+                            $('#signin_pass').val())
+            .catch(function(error) {
+              // Handle Errors here.
+              var errorCode = error.code;
+              var errorMessage = error.message;
+              
+              console.log('Auth failed. code: ', errorCode);
+              console.log('message: ', errorMessage);
+              
+              $('#alert_danger').text('Sign in failed. Setup an Admin user in your Firebase console.');
+              $('#alert_danger').fadeIn().delay(5000).fadeOut();
+            });
+        }
+        
+        
+        $('#setup_site_color').on('keyup', function () {
+        	$('#setup_color_display').css('background-color', this.value);
+        });
+        
+        
+        var all_valid = true;
+        function submit() {
+            all_valid = true;
+            $('.validate_me').each(function() {
+                // remove \n
+               $(this).removeClass('is-valid');
+               $(this).removeClass('is-invalid');
+               $('#' + $(this).attr('id') + '_feedback').css('opacity', 0.0);
+               console.log('done remove old valids');
+            });
+            
+            console.log('starting new valids');
+            $('.validate_notblank').each(function() {
+                if($(this).hasClass('is-invalid')) {
+                    all_valid = false;
+                    return;
                 }
+    
+                
+                if (this.value.length > 0)
+                    $(this).addClass('is-valid');
                 else {
-                  $('#alert_danger').text(data[1]).fadeIn().delay(2400).fadeOut();
+                    $(this).addClass('is-invalid');
+                    all_valid = false;
+                    $('#' + $(this).attr('id') + '_feedback').css('opacity', 1);
+                }
+    
+                
+            });
+            // every other validator will say that blank is valid
+            $('.validate_http').each(function() {
+                if($(this).hasClass('is-invalid')) {
+                    all_valid = false;
+                    return;
+                }
+    
+                if(this.value.length === 0) {
+                    $(this).addClass('is-valid');
+                    return;
+                }
+                
+                let this_str = this.value.substring(0,7).toLowerCase();
+                if (this_str === 'https:/' && this.value.toLowerCase()[7] === '/' || this_str === 'http://')
+                    $(this).addClass('is-valid');
+                else {
+                    $('#' + $(this).attr('id') + '_feedback').css('opacity', 1);
+                    all_valid = false;
+                    $(this).addClass('is-invalid');
+                }
+    
+            });
+            $('.validate_color').each(function() {
+                if($(this).hasClass('is-invalid')) { 
+                    all_valid = false;
+                    return;
+                }
+    
+                if(this.value.length === 0) {
+                    $(this).addClass('is-valid');
+                    return;
+                }
+                
+                if (/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(this.value))
+                    $(this).addClass('is-valid');
+                else {
+                    $('#' + $(this).attr('id') + '_feedback').css('opacity', 1);
+                    all_valid = false;
+                    $(this).addClass('is-invalid');
+                }
+    
+            });
+            $('.validate_root').each(function() {
+                if($(this).hasClass('is-invalid')) {
+                    all_valid = false;
+                    return;
+                }
+                
+                if(this.value.length === 0) {
+                    $(this).addClass('is-valid');
+                    return;
+                }
+                
+                let this_str = this.value.substring(0,7).toLowerCase();
+                if ((this_str === 'https:/' && this.value.toLowerCase()[7] === '/' || this_str === 'http://')
+                    && this.value[this.value.length - 1] === '/')
+                    $(this).addClass('is-valid');
+                else {
+                    $('#' + $(this).attr('id') + '_feedback').css('opacity', 1);
+                    all_valid = false;
+                    $(this).addClass('is-invalid');
+                }
+    
+            });
+            $('.validate_none').each(function() {
+                if($(this).hasClass('is-invalid')) {
+                    all_valid = false;
+                    return;
+                }
+    
+                $(this).addClass('is-valid');
+                console.log('finishing validates');
+            });
+            
+            console.log('all valid is ', all_valid);
+            
+            if (all_valid) {
+                
+                let for_db = {'gen_site_data': {}, 'pages': {}};
+                
+                for_db['gen_site_data'] = {
+                    'name': clean_short_text($('#setup_site_name').val()),
+                    'header_img': {
+                        'url': $('#setup_header_image').val(),
+                        'ratio': $('#setup_header_ratio').val()
+                    },
+                    'favicon_url': $('#setup_favicon').val(),
+                    'background_img': {
+                        'url': $('#setup_background_image').val()
+                    },
+                    'color': $('#setup_site_color').val(),
+                    'root': $('#setup_root').val(),
+                    'setup_complete': 'yes',
+                };
+                
+                let slideshow = clean_url($('#setup_slideshow_images').val()); // don't remove semicolons
+                slideshow = slideshow.split(';');
+                for_db['gen_site_data']['slideshow'] = {'imgs': []};
+                
+                slideshow.forEach(function (str) {
+                    if(str.length === 0)
+                        return;
+                        
+                    for_db['gen_site_data']['slideshow']['imgs'].push({'url': str, 'ratio': ''});
+                });
+                
+                
+                let tabs = $('#setup_tabs').val();
+                if (tabs.length === 0)
+                    tabs = 'Home';
+                    
+                tabs = tabs.replace(/\n|\t/g, '').split(';');
+                let tabs_dir = {};
+                let tabs_ordered = {};
+                let pages_dir = {};
+                let tabs_keys = [];
+                let this_url = '';
+                let counter = 1;
+                tabs.forEach(function(tab_str, i){
+                    if (tab_str.length === 0)
+                        return;
+                    
+                    // TODO create url from string, check url is unique, add to dir and keys
+                    this_url = clean_make_url(tab_str);
+                    if (tabs_keys.includes(this_url)) {
+                        this_url = clean_make_url(tab_str)+counter;
+                        while (tabs_keys.includes(this_url)) {
+                            counter += 1;
+                            this_url = clean_make_url(tab_str)+counter;
+                        }
+                    }
+        
+                    tabs_keys.push(this_url);
+                    tabs_dir[this_url] = {'name': clean_short_text(tab_str), 'url': this_url, 'type': 'page'};
+                    pages_dir[this_url] = {'name': clean_short_text(tab_str), 'url': this_url, 'type': 'page', 'content': 'Nothing here'};
+                    tabs_ordered[i.toString()] = {'name': clean_short_text(tab_str), 'url': this_url, 'type': 'page'};
+                    
+                    if (i === 0) {
+                        for_db['get_site_data']['default_url'] = this_url;
+                    }
+                });
+                
+                for_db['gen_site_data']['tabs'] = tabs_dir;
+                for_db['gen_site_data']['tabs_ordered'] = tabs_ordered;
+                for_db['gen_site_data']['pages'] = tabs_dir;
+                for_db['pages'] = pages_dir;
+                console.log(for_db);
+                
+                let ref = firebase.database().ref('fcms_data');
+                ref.update(for_db)
+                    .then(function() {
+                        $('.step_1').fadeOut();
+                        $('.step_2').fadeOut(200, function() {
+                            $('.step_3').fadeIn();
+                            do_assignment('general');
+                        });
+                    },
+                    function(error){
+                        $('#alert_danger').text('Connection Error: '+ error.message);
+                        $('#alert_danger').fadeIn().delay(10000).fadeOut();
+                    });
+            }
+    
+        }
+        
+        function clean_make_url (str) {
+          return str
+            .replace(/&/g, '&amp;')
+            .replace(/\?/g, '&#63;')
+            .replace(/>/g, '&gt;')
+            .replace(/</g, '&lt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&apos;')
+            .replace(/\s/g, '')
+            .toLowerCase();
+        }
+        function clean_url (str) {
+          return str
+            .replace(/>/g, '&gt;')
+            .replace(/</g, '&lt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&apos;')
+            .replace(/\s/g, '')
+            .toLowerCase();
+        }
+        function clean_short_text(str) {
+            return str
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&apos;')
+            .replace(/>/g, '&gt;')
+            .replace(/</g, '&lt;')
+            .replace(/\n|\t/g, '')
+            .trim();
+        }
+        
+        $('#setup_enter').on('click', submit);
+        $('#setup_root').on('keypress', function(e){
+        	if(e.which === 13) {
+              submit();
+          }
+        });
+        $('textarea').autoResize();
+        
+        
+        
+        //  ====================================== MAIN WORKER ======================================
+        function do_assignment(assignment, details){
+            assignment = assignment || 'general';
+            
+            // tabs
+            $('.go_home').on('click', function() {
+                do_assignment('general');
+                $('#gen_tab').addClass('active');
+                $('#tabs_tab').removeClass('active');
+            });
+            $('#gen_tab').on('click', function() {
+                do_assignment('general');
+                $(this).addClass('active');
+                $('#tabs_tab').removeClass('active');
+            });
+            $('#tabs_tab').on('click', function() {
+                do_assignment('tab');
+                $(this).addClass('active');
+                $('#gen_tab').removeClass('active');
+            });
+            $('#site_color').on('keyup', function () {
+            	$('#color_display').css('background-color', this.value);
+            });
+            $('#save').on('click', submit3);
+            $('#root').on('keypress', function(e){
+            	if(e.which === 13) {
+                  submit3();
+              }
+            });
+        
+            switch(assignment){
+                case 'general': 
+                    console.log('doing general');
+                    firebase.database().ref('fcms_data/gen_site_data').on('value',
+                        function(snap){
+                            let data = snap.val();
+                            console.log(data);
+                            $('.site_name').text(data['name']);
+                            
+                            $('#site_name').val(data['name']);
+                            $('#header_image').val(data['header_img']['url']);
+                            $('#header_ratio').val(data['header_img']['ratio']);
+                            $('#favicon').val(data['favicon_url']);
+                            $('#background_image').val(data['background_img']['url']);
+                            
+                            if(typeof data['slideshow'] !== 'undefined' && 
+                                typeof data['slideshow']['imgs'] !== 'undefined') {
+                                let slide_str = '';
+                                data['slideshow']['imgs'].forEach(function(img){
+                                    slide_str += img['url'] + ';';
+                                });
+                                $('#slideshow_images').val(slide_str);
+                            }
+                            
+                            $('#site_color').val(data['color']);
+                            $('#root').val(data['root']);
+                            
+                        }, 
+                        function(error){
+                            $('#alert_danger').text(error.message);
+                            $('#alert_danger').fadeIn().delay(7000).fadeOut();
+                        });
+                break;
+                case 'tab':
+                    console.log('doing tabs');
+                break;
+                default:
+                    do_assignment('general'); // infinite loop potential
+            }
+        }
+        
+        var all_valid3 = true;
+        function submit3() {
+            all_valid3 = true;
+            $('.validate_me3').each(function() {
+                // remove \n
+               $(this).removeClass('is-valid');
+               $(this).removeClass('is-invalid');
+               $('#' + $(this).attr('id') + '_feedback').fadeOut();
+            });
+            
+            $('.validate_notblank3').each(function() {
+                if($(this).hasClass('is-invalid')) {
+                    all_valid3 = false;
+                    return;
+                }
+    
+                
+                if (this.value.length > 0)
+                    $(this).addClass('is-valid');
+                else {
+                    $(this).addClass('is-invalid');
+                    all_valid3 = false;
+                    $('#' + $(this).attr('id') + '_feedback').fadeIn();
+                }
+    
+                
+            });
+            // every other validator will say that blank is valid
+            $('.validate_http3').each(function() {
+                if($(this).hasClass('is-invalid')) {
+                    all_valid3 = false;
+                    return;
+                }
+    
+                if(this.value.length === 0) {
+                    $(this).addClass('is-valid');
+                    return;
+                }
+                
+                let this_str = this.value.substring(0,7).toLowerCase();
+                if (this_str === 'https:/' && this.value.toLowerCase()[7] === '/' || this_str === 'http://')
+                    $(this).addClass('is-valid');
+                else {
+                    $('#' + $(this).attr('id') + '_feedback').fadeIn();
+                    all_valid3 = false;
+                    $(this).addClass('is-invalid');
                 }
             });
+            $('.validate_color3').each(function() {
+                if($(this).hasClass('is-invalid')) { 
+                    all_valid3 = false;
+                    return;
+                }
+    
+                if(this.value.length === 0) {
+                    $(this).addClass('is-valid');
+                    return;
+                }
+                
+                if (/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(this.value))
+                    $(this).addClass('is-valid');
+                else {
+                    $('#' + $(this).attr('id') + '_feedback').fadeIn();
+                    all_valid3 = false;
+                    $(this).addClass('is-invalid');
+                }
+    
+            });
+            $('.validate_root3').each(function() {
+                if($(this).hasClass('is-invalid')) {
+                    all_valid3 = false;
+                    return;
+                }
+                
+                if(this.value.length === 0) {
+                    $(this).addClass('is-valid');
+                    return;
+                }
+                
+                let this_str = this.value.substring(0,7).toLowerCase();
+                if ((this_str === 'https:/' && this.value.toLowerCase()[7] === '/' || this_str === 'http://')
+                    && this.value[this.value.length - 1] === '/')
+                    $(this).addClass('is-valid');
+                else {
+                    $('#' + $(this).attr('id') + '_feedback').fadeIn();
+                    all_valid3 = false;
+                    $(this).addClass('is-invalid');
+                }
+    
+            });
+            $('.validate_none3').each(function() {
+                if($(this).hasClass('is-invalid')) {
+                    all_valid3 = false;
+                    return;
+                }
+    
+                $(this).addClass('is-valid');
+            });
+            
+            console.log('all valid is ', all_valid3);
+            
+            if (all_valid3) {
+                
+                let for_db = {};
+                
+                for_db['gen_site_data/name'] = clean_short_text($('#site_name').val());
+                for_db['gen_site_data/header_img'] = {
+                        'url': $('#header_image').val(),
+                        'ratio': $('#header_ratio').val()
+                    };
+                for_db['gen_site_data/favicon_url'] = $('#favicon').val();
+                for_db['gen_site_data/background_img'] = {
+                        'url': $('#background_image').val()
+                    };
+                for_db['gen_site_data/color'] = $('#site_color').val();
+                for_db['gen_site_data/root'] = $('#root').val();
+                
+                let slideshow = clean_url($('#slideshow_images').val()); // don't remove semicolons
+                slideshow = slideshow.split(';');
+                for_db['gen_site_data/slideshow'] = {'imgs': []};
+                
+                slideshow.forEach(function (str) {
+                    if(str.length === 0)
+                        return;
+                        
+                    for_db['gen_site_data/slideshow']['imgs'].push({'url': str, 'ratio': ''});
+                });
+                
+                console.log(for_db);
+                
+                let ref = firebase.database().ref('fcms_data');
+                ref.update(for_db)
+                    .then(function() {
+                        $('#alert_success').text('Saved');
+                        $('#alert_success').fadeIn().delay(4000).fadeOut();
+                    },
+                    function(error){
+                        $('#alert_danger').text('Connection Error: '+ error.message);
+                        $('#alert_danger').fadeIn().delay(10000).fadeOut();
+                    });
+            }
+    
+        }
     }
-    $('#enter').on('click', submit);
-    $('#password').on('keypress', function(e){
-    	if(e.which === 13) {
-          submit();
-      }
-    });
-    $('textarea').autoResize();
+    
   </script>
 </html>
+
+<!--
+faq
+sometimes the url will switch to ....firebaseapp.com/... or some other domain:
+This is most likely because of your FCMS URL setting
+make sure it is correct in your settings
+if you have a custom domain (example.com), make sure your FCMS URL includes your custom domain:
+"https://example.com/" or "https://example.com/sub/"
+
+clean text before displaying
+
+split user posts to another list to fanout. nexus!?
+-->
