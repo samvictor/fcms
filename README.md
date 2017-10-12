@@ -47,7 +47,23 @@ In this case, */public/sub/* is your FCMS directory and *example.com/sub/* is yo
 I'll continue these instructions assuming you didn't change anything and */public/fcms/* 
 is your FCMS directory.
 
-Finally, find and rename */public/fcms/init_settings.js* to */public/fcms/settings.js*
+Find and rename */public/fcms/init_settings.js* to */public/fcms/settings.js*
+
+Finally edit your */firebase.json* file to look like this:
+
+```
+{
+  "hosting": {
+    "public": "public",    
+    "rewrites": [
+      {
+        "source": "/fcms/**", "destination": "/fcms/index.html"
+      }
+    ]
+  }
+}
+
+```
 
 ### 3. Get your Firebase Config Info
 Once you've created your Firebase account, go to the *Overview* tab in your Firebase console.
