@@ -1,7 +1,7 @@
 <!-- template_1.html-->
 <!-- Written by Sam for fcms-->
 <!-- This view should show all, non admin pages in fcms-->
-<!-- version 1.0-->
+<!-- version 1.3-->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -106,7 +106,7 @@
       .tab {
       	display: inline-block;
       	border: solid 1px black;
-      	margin: 1px 0.1% 1px 0.1%;
+      	margin: 1px 0.3% 1px 0.3%;
       	padding: 12px 15px;
       	background-color: #282828;
       	border-radius: 2px;
@@ -257,20 +257,141 @@
         .replace(/\s|\?|\.|\#|\$|\[|\]/g, '')
         .toLowerCase();
     }
+    function clean_short_txt(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/>/g, '&gt;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;')
+        .replace(/\n|\t/g, '');
+    }
+    function clean_url(str) {
+      return str
+        .replace(/>/g, '&gt;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;')
+        .replace(/\s/g, '');
+    }
+    
+    function translate_content(str) {
+        let raw_str = str
+            .replace(/&/g, '&amp;')
+            .replace(/>/g, '&gt;')
+            .replace(/</g, '&lt;')
+            .replace(/😎apos😎/g, '&apos;')
+            .replace(/😎quot😎/g, '&quot;');
+
+        // must be valid json
+        // TODO: check db for enabled features for non admin users
+        // TODO: user chooses tab size
+        
+        let list_components = [];
+        let start_i = 0;
+        let end_i = 0;
+        let temp_str = '';
+        let temp_dict = {};
+        
+        let temp_edges = get_edges(raw_str);
+        start_i = temp_edges[0];
+        end_i = temp_edges[1];
+        
+        while (start_i >= 9 && end_i >= 0) {
+            temp_str = raw_str.substring(start_i, end_i + 1);
+            raw_str = raw_str.substring(end_i + 8);
+            
+            console.log('to json:', temp_str);
+            
+            try {
+                temp_dict = JSON.parse(temp_str);
+                list_components.push(temp_dict);
+            }
+            catch (e) {
+                console.log('error converting to JSON while translating');
+                console.log(e);
+            }
+            
+            temp_edges = get_edges(raw_str);
+            start_i = temp_edges[0];
+            end_i = temp_edges[1];
+        }
+        
+        console.log('done interpreting, whats left is raw_str = ', raw_str);
+        
+        let clean_html = '';
+        
+        list_components.forEach(function(comp) {
+            switch(comp['type']) {
+                case 'text': // plain old text
+                    // {'type': 'text', 'data': 'hello world'}
+                    clean_html += '<t>';
+                    clean_html +=   comp['data']
+                                        .replace(/'/g, '&apos;')
+                                        .replace(/"/g, '&quot;')
+                                        .replace(/\n/g, '<br/>')
+                                        .replace(/\t/g, '<div style="width: 2em; display: inline-block"></div>');
+                    clean_html += '</t>';
+                break;
+                case 'padding': // apply padding to anything
+                    // {'type': 'padding', 
+                    //    'data': '😎start😎{'text'}😎end😎😎start😎{'something else'}😎end😎',
+                    //     'padding': 'top left bottom right'}
+                    clean_html += '<div style="padding: '+ comp['padding'] +'; display: block;">';
+                    clean_html +=       translate_content(comp['data']);
+                    clean_html += '</div>';
+                break;
+                default:
+                    console.log('default reached while interpreting text with type = ' + comp['type']);
+            }
+        });
+        
+        return clean_html
+            .replace(/😎shades_emoji😎/g, '😎');
+    }
+    
+    function get_edges(str) {
+        let depth = 0;
+        let working_str = str;
+        let ret_list = [-1, -1];
+        let start_i = 0;
+        let end_i = 0;
+        ret_list[0] = working_str.indexOf('😎start😎') + 9;
+        
+        while (true) {
+            
+            start_i = working_str.indexOf('😎start😎') + 9;
+            end_i = working_str.indexOf('😎end😎') - 1;
+            if (start_i <= end_i && start_i >= 9) {
+                depth += 1;
+                working_str = working_str.replace('😎start😎', 'aaaaaaaaa');
+            }
+            else if(depth <= 0) {
+                return ret_list;
+            }
+            else {
+                depth -= 1;
+                ret_list[1] = working_str.indexOf('😎end😎') - 1;
+                working_str = working_str.replace('😎end😎', 'aaaaaaa');
+            }
+        }
+    }
+
     
     firebase.database().ref('fcms_data/gen_site_data').on('value', function(snapshot) {
             page_data = snapshot.val();
+            page_data['name'] = clean_short_txt(page_data['name']);
+            page_data['default_url'] = clean_db(page_data['default_url']);
+            page_data['root'] = clean_url(page_data['root']);
+            page_data['color'] = clean_short_txt(page_data['color']);
+            page_data['favicon_url'] = clean_url(page_data['favicon_url']);
+            
             // Main Page Content
-            let location_pathname = window.location.href;
-            //console.log(location_pathname);
+            let location_pathname = clean_url(window.location.href);
+
             // remove trailing slash if it exists
             if (location_pathname[ location_pathname.length - 1 ] === '/')
                 location_pathname = location_pathname.substring(0, location_pathname.length - 1);
-            //console.log(location_pathname);
-            
-            //page_data['url'] = window.location.href.replace(page_data['root'], '');
-            //if(page_data['url'][page_data['url'].length - 1] === '/')
-            //    page_data['url'] = page_data['url'].substring(0, page_data['url'].length - 1);
             
             let root_index = location_pathname.indexOf(page_data['root']);
             page_data['url'] = location_pathname.substring(root_index+page_data['root'].length).toLowerCase();
@@ -286,8 +407,8 @@
                 
                 firebase.database().ref('fcms_data/pages/' + temp_url).on('value', function(snap2) {
                     temp_page = snap2.val(); 
-                    page_data['page_title'] = temp_page['name'];
-                    page_data['page_content'] = temp_page['content'];
+                    page_data['page_title'] = clean_short_txt(temp_page['name']);
+                    page_data['page_content'] = translate_content(temp_page['content']);
                     display_page();
                 });
             }
@@ -302,8 +423,8 @@
                         display_page();
                     }
                     else {
-                        page_data['page_title'] = temp_page['name'];
-                        page_data['page_content'] = temp_page['content'];
+                        page_data['page_title'] = clean_short_txt(temp_page['name']);
+                        page_data['page_content'] = translate_content(temp_page['content']);
                         display_page();
                     }
                 });
@@ -315,8 +436,8 @@
         
         function display_page() {        
             // First Page Draw - page_data is now read-only
-            $('#page_title').text(page_data['page_title'].toUpperCase());
-            $('#page_content').html(page_data['page_content']);
+            $('#page_title').text( page_data['page_title'].toUpperCase());
+            $('#page_content').html( page_data['page_content'] );
             
             // replace state
             history.replaceState (
@@ -326,10 +447,14 @@
             );
             
             curr_url = page_data['url'];
+            
+            // BACKGROUND
             if (page_data['background_img']['url'] !== '' && page_data['background_img']['url'] !== '') {
-                $('body').css('background', 'url('+page_data['background_img']['url']+') no-repeat')
+                $('body').css('background', 'url('+ clean_url( page_data['background_img']['url'] ) +') no-repeat')
                     .css('background-size', 'cover').css('background-attachment', 'fixed');
             }
+            
+            // SLIDESHOW
             let slideshow_html = '';
             let slideshow_images = page_data['slideshow'];
             if (slideshow_images === undefined) {
@@ -344,15 +469,16 @@
                     slideshow_html += '<div class="item active" >';
                 else
                     slideshow_html += '<div class="item" >';
-            	slideshow_html +=     '<img alt="carousel image" src="'+ slideshow_images[i]['url'] +'" class="slideshow_image" />';
+            	slideshow_html +=     '<img alt="carousel image" src="'+ clean_url( slideshow_images[i]['url'] ); 
+            	slideshow_html +=                                          '" class="slideshow_image" />';
             	slideshow_html += '</div> ';
             }
             $('#carousel_inner').append(slideshow_html);
             if (page_data['header_img']['url'] !== '') {
                 $('#site_title').css('display', 'none');
-                $('#header_image').css('display', 'block').attr('src', page_data['header_img']['url']);
+                $('#header_image').css('display', 'block').attr('src', clean_url( page_data['header_img']['url'] ));
                 if (page_data['header_img']['ratio'] !== '')
-                    $('#header_image').attr('ratio', page_data['header_img']['ratio'])
+                    $('#header_image').attr('ratio', page_data['header_img']['ratio']);
             }
             else
                 $('#site_title').text(page_data['name']);//.css('color', page_data['site_color']);
@@ -364,18 +490,19 @@
             jq_css +=         '.tab.active { background-color: '+ page_data['color'] +'; } ';
             jq_css +=    '</style>';
             $('head').append(jq_css);
+            
             // TABS
             let tabs_html = '';
             let tab = null;
             for(let key in page_data['tabs_ordered']) {
                 tab = page_data['tabs_ordered'][key];
-                tabs_html += '<div id="'+tab['url']+'_tab" class="tab ';
+                tabs_html += '<div id="'+ clean_db(tab['url']) +'_tab" class="tab ';
                 if (tab['url'] === page_data['url'] || page_data['url'] === '' && tab['url'] === page_data['default_url'])
                     tabs_html += 'active';
-                tabs_html += '" href='+tab['url']+'>'+ tab['name'].toUpperCase() + '</div>';
+                tabs_html += '" href='+ clean_db(tab['url']) +'>'+ clean_short_txt(tab['name']).toUpperCase() + '</div>';
             }
             $('#tab_bar').html(tabs_html);
-            //$('.tab.active').css('background-color', page_data['color']);
+            
             // prevent page popping
             $('img').each(function(){
                 let this_img = $(this);
@@ -417,7 +544,7 @@
                     );
                     console.log("do_assign push state. push_state is", push_state);
                 }
-                let new_url = assignment_data.toLowerCase();
+                let new_url = clean_db(assignment_data.toLowerCase());
                 
                 if (new_url === '')
                 	new_url = page_data['default_url'];
@@ -426,19 +553,16 @@
                 firebase.database().ref('/fcms_data/pages/'+new_url).once('value', function(snapshot){
                     let page = snapshot.val();
                     if (page !== null) {
-                        $('#page_title').text(page['name'].toUpperCase());
-                        $('#page_content').html(page['content']);
-                        //$('a').css('color', page_data['site_color']);
-                        //$('#loading_div').fadeOut(200);
-                        loading = false;
+                        $('#page_title').text( clean_short_txt(page['name'].toUpperCase()) );
+                        $('#page_content').html( translate_content(page['content']) );
+                        
                         $('.tab.active').removeClass('active');
                         $('#'+new_url+'_tab').addClass('active');
-                        //setTimeout(() => $('.tab.active').css('background-color', page_data['site_color']), 100);
-                        document.title = page['name'] + ' - ' + page_data['name'];
+                        
+                        document.title = clean_short_txt(page['name']) + ' - ' + page_data['name'];
                         if (push_state) {
                             history.replaceState({'page_data': page_data, 'new_url': new_url}, 
                                                     page_data['page_title'], page_data['root']+new_url);
-                            console.log("do_assign replace state. push_state is", push_state);
                         }
                     }
                     else {
@@ -451,7 +575,6 @@
                         if (push_state) {
                             history.replaceState({'page_data': page_data, 'new_url': new_url}, 
                                                     page_data['page_title'], page_data['root']+new_url);
-                            console.log("do_assign replace state. push_state is", push_state);
                         }
                     }
                 });
