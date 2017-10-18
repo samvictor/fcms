@@ -264,7 +264,8 @@
         .replace(/</g, '&lt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&apos;')
-        .replace(/\n|\t/g, '');
+        .replace(/\n|\t/g, '')
+        .trim();
     }
     function clean_url(str) {
       return str
@@ -329,8 +330,8 @@
                     clean_html +=   comp['data']
                                         .replace(/'/g, '&apos;')
                                         .replace(/"/g, '&quot;')
-                                        .replace(/\n/g, '<br/>')
-                                        .replace(/\t/g, '<div style="width: 2em; display: inline-block"></div>');
+                                        .replace(/😎newline😎/g, '<br/>')
+                                        .replace(/😎tab😎/g, '<div style="width: 2em; display: inline-block"></div>');
                     clean_html += '</t>';
                 break;
                 case 'padding': // apply padding to anything

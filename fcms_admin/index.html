@@ -19,7 +19,11 @@
           color: #101010;
       }
       h4, h5 { color: #282828; }
-      body { background-color: #f8f8f8; }
+      body, html {
+          background-color: #f8f8f8;
+          height: 100%;
+      }
+      
       .step_1{
       	padding-top: 200px;
       	font-weight: 100;
@@ -107,23 +111,26 @@
       }
       
       /* ======================= MAIN ==================*/
-      #main_div {
+      #general_content{
           padding: 5%;
-      	  padding-top: 0px;
+      	  padding-top: 60px;
       }
-      #main_div .valid-feedback {
+      #main_div {
+      	  height: 100%;
+      }
+      #general_content .valid-feedback {
           opacity: 1;
           transition: opacity 0.5s;
           display: none;
           color: #d9534f;
       }
-      #main_div input, #main_div textarea {
+      #general_content input, #general_content textarea {
       	color: black;
       	margin: auto;
       	margin-right: auto;
       	text-align: center;
       }
-      #main_div h5 {
+      #general_content h5 {
       	margin-top: 30px;
       }
       #color_display {
@@ -132,6 +139,79 @@
       	margin: 10px auto 5px auto;
       	background-color: #cb2031;
       }
+      
+      /* ================================ TABS PAGE ====================== */
+      #tabs_content{
+      	  padding-top: 40px;
+      	  height: 100%;
+      	  text-align: left;
+      	  overflow-y: hidden;
+      }
+      
+      #side_bar{
+          border-right: solid 1px #444;
+          padding-top: 40px;
+          height: 100%;
+          width: 100%;
+          display: inline-block;
+          text-align: center;
+          overflow-y: auto;
+          position: relative
+      }
+      .sidebar_tab {
+          cursor: pointer;
+          border-top: solid 1px #888;
+          border-bottom: solid 1px #888;
+          padding: 5px;
+          margin-top: 3px;
+          margin-bottom: 3px;
+          color: #444;
+          transition: all 0.3s;
+          background-color: #ececec;
+      }
+      .sidebar_tab:hover {
+          background-color: #fafafa;
+          color: #000;
+      }
+      .sidebar_tab.active {
+          background-color: #fff;
+          color: #000;
+      }
+      
+      #tabs_main{
+          padding-top: 40px;
+      	  display: inline-block;
+      	  vertical-align: top;
+          text-align: center;
+          height: 100%;
+          overflow-y: auto;
+      }
+      #tabs_main_text {
+          width: 100%;
+          height: calc(100% - 120px);
+          display: block;
+          resize: none;
+      }
+      #tabs_main_save {
+          margin-top: 7px;
+          margin-bottom: 10px;
+      }
+      #tabs_sidebar_in {
+          display: none;
+          position: absolute;
+          right: 0px;
+          top: 80px;
+          width: 20px;
+      }
+      #tabs_sidebar_out {
+          display: none;
+          position: fixed;
+          left: 0px;
+          top: 80px;
+          width: 20px;
+      }
+      
+      
       
       .nav-link {
           transition: color 0.3s;
@@ -251,7 +331,7 @@
     
     <!-- ==================================== MAIN DIV ====================================================== -->
     <div id="main_div" style="display:none" class="step_3">
-      <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+      <nav class="navbar fixed-top navbar-expand-sm navbar-dark bg-dark">
           <a class="navbar-brand site_name go_home"></a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" 
                     data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
@@ -262,7 +342,7 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
               <li id="gen_tab" class="nav-item active">
-                <a class="nav-link">General<span class="sr-only">current</span></a>
+                <a class="nav-link">General<span class="sr-only">current</span> <!-- TODO: move this --></a>
               </li>
               <li id="tabs_tab" class="nav-item">
                 <a class="nav-link">Tabs & Pages</a>
@@ -273,80 +353,93 @@
           </div>
       </nav>
       
-      <div style="height: 60px;"></div> 
-        
-      <h5>Site Name</h5>
-      <input id="site_name" placeholder="Site Name" class="form-control validate_me3 validate_notblank3">
-      <div id="site_name_feedback" class="valid-feedback">
-        Please provide a Site Name.
+      <div id="general_content">
+          <h5>Site Name</h5>
+          <input id="site_name" placeholder="Site Name" class="form-control validate_me3 validate_notblank3">
+          <div id="site_name_feedback" class="valid-feedback">
+            Please provide a Site Name.
+          </div>
+          
+          <h5>Header Image URL</h5>
+          <t>full path</t>
+          <input id="header_image" placeholder="https://example.com/fcms_serve/header_img.png" class="form-control validate_me3 validate_http3">
+          <div id="header_image_feedback" class="valid-feedback">
+            Please provide a valid Header Image URL or leave this form blank.<br>
+            Remember to include the "https://" at the beginning (e.g. https://example.com/fcms_serve/header_img.png)
+          </div>
+          
+          <h5>Header Image Ratio</h5>
+          <t>to prevent page popping (image width/image height)</t>
+          <input id="header_ratio" placeholder="2.54019" type="number" class="form-control validate_me3 validate_none3">
+          <div id="header_ratio_feedback" class="valid-feedback">
+            Please provide a valid Header Image Ratio or leave this form blank.<br>
+            Must be a number (e.g. 2.54019)
+          </div>
+          
+          <h5>Favicon Url</h5>
+          <t>full path</t>
+          <input id="favicon" placeholder="https://example.com/fcms_serve/favicon_img.jpg" class="form-control validate_me3 validate_http3">
+          <div id="favicon_feedback" class="valid-feedback">
+            Please provide a valid Favicon URL or leave this form blank.<br>
+            Remember to include the "https://" at the beginning (e.g. https://example.com/fcms_serve/favicon_img.jpg)
+          </div>
+          
+          <h5>Background Image</h5>
+          <t>full path</t>
+          <input id="background_image" placeholder="https://example.com/fcms_serve/background_image.png" 
+                class="form-control validate_me3 validate_http3">
+          <div id="background_image_feedback" class="valid-feedback">
+            Please provide a valid Background Image or leave this form blank.<br>
+            Remember to include the "https://" at the beginning (e.g. https://example.com/fcms_serve/background_image.jpg)
+          </div>
+          
+          <h5>Slideshow Images</h5>
+          <t>(semicolon ";" separated)</t>
+          <textarea id="slideshow_images" 
+            placeholder="https://example.com/fcms_serve/image1.jpg; https://example.com/fcms_serve/image2.jpg; https://example.com/fcms_serve/image_3.png" 
+            class="form-control validate_me3 validate_http3"></textarea>
+          <div id="slideshow_images_feedback" class="valid-feedback">
+            Please provide a valid set of Slideshow Images or leave this form blank.<br>
+            Remember to include the "https://" at the beginning of each URL
+          </div>
+          
+          <h5>Site Color </h5>
+          <t>(hex rbg, include the hash)</t>
+          <input id="site_color" value="#cb2031" class="form-control validate_me3 validate_color3 validate_notblank3">
+          <div id="color_display"></div>
+          <div id="site_color_feedback" class="valid-feedback">
+            Please provide a valid Site Color.<br>
+            (e.g. #cb2031)
+          </div>
+          
+          <h5>FCMS URL for Website</h5>
+          <t>If you don't know what that is, find our here: <br>
+            <a href="https://github.com/samvictor/FCMS#5-hit-the-site">github.com/samvictor/FCMS#5-hit-the-site</a> or 
+            <a href="https://github.com/samvictor/FCMS#fcms-url-setting">https://github.com/samvictor/FCMS#fcms-url-setting</a>
+          </t><br>
+          <t>(Remember to include the "https://" and the trailing slash)</t>
+          <input id="root" class="form-control validate_me3 validate_root3 validate_notblank3" 
+                placeholder="https://example.com/ or https://example.com/sub/">
+          <div id="root_feedback" class="valid-feedback">
+            Please provide a valid FCMS URL.<br>
+            This is the root of your FCMS website. It is where the user's index.html is.
+          </div><br>
+          
+          <button id="save" class="btn btn-outline-success">Save</button><br>
       </div>
-      
-      <h5>Header Image URL</h5>
-      <t>full path</t>
-      <input id="header_image" placeholder="https://example.com/fcms_serve/header_img.png" class="form-control validate_me3 validate_http3">
-      <div id="header_image_feedback" class="valid-feedback">
-        Please provide a valid Header Image URL or leave this form blank.<br>
-        Remember to include the "https://" at the beginning (e.g. https://example.com/fcms_serve/header_img.png)
+      <div id="tabs_content" style="display: none">
+        <div id="side_bar">
+            <t>PAGE</t>
+        </div>
+        <div id="tabs_main" style="display: none;">
+            <h3 id="tabs_main_title"></h3>
+            <div id="tabs_sidebar_out">&gt;</div>
+            Rememeber to save before moving to another page.
+            <textarea id="tabs_main_text">
+            </textarea>
+            <button id="tabs_main_save" class="btn btn-outline-success">Save</button><br>
+        </div>
       </div>
-      
-      <h5>Header Image Ratio</h5>
-      <t>to prevent page popping (image width/image height)</t>
-      <input id="header_ratio" placeholder="2.54019" type="number" class="form-control validate_me3 validate_none3">
-      <div id="header_ratio_feedback" class="valid-feedback">
-        Please provide a valid Header Image Ratio or leave this form blank.<br>
-        Must be a number (e.g. 2.54019)
-      </div>
-      
-      <h5>Favicon Url</h5>
-      <t>full path</t>
-      <input id="favicon" placeholder="https://example.com/fcms_serve/favicon_img.jpg" class="form-control validate_me3 validate_http3">
-      <div id="favicon_feedback" class="valid-feedback">
-        Please provide a valid Favicon URL or leave this form blank.<br>
-        Remember to include the "https://" at the beginning (e.g. https://example.com/fcms_serve/favicon_img.jpg)
-      </div>
-      
-      <h5>Background Image</h5>
-      <t>full path</t>
-      <input id="background_image" placeholder="https://example.com/fcms_serve/background_image.png" 
-            class="form-control validate_me3 validate_http3">
-      <div id="background_image_feedback" class="valid-feedback">
-        Please provide a valid Background Image or leave this form blank.<br>
-        Remember to include the "https://" at the beginning (e.g. https://example.com/fcms_serve/background_image.jpg)
-      </div>
-      
-      <h5>Slideshow Images</h5>
-      <t>(semicolon ";" separated)</t>
-      <textarea id="slideshow_images" 
-        placeholder="https://example.com/fcms_serve/image1.jpg; https://example.com/fcms_serve/image2.jpg; https://example.com/fcms_serve/image_3.png" 
-        class="form-control validate_me3 validate_http3"></textarea>
-      <div id="slideshow_images_feedback" class="valid-feedback">
-        Please provide a valid set of Slideshow Images or leave this form blank.<br>
-        Remember to include the "https://" at the beginning of each URL
-      </div>
-      
-      <h5>Site Color </h5>
-      <t>(hex rbg, include the hash)</t>
-      <input id="site_color" value="#cb2031" class="form-control validate_me3 validate_color3 validate_notblank3">
-      <div id="color_display"></div>
-      <div id="site_color_feedback" class="valid-feedback">
-        Please provide a valid Site Color.<br>
-        (e.g. #cb2031)
-      </div>
-      
-      <h5>FCMS URL for Website</h5>
-      <t>If you don't know what that is, find our here: <br>
-        <a href="https://github.com/samvictor/FCMS#5-hit-the-site">github.com/samvictor/FCMS#5-hit-the-site</a> or 
-        <a href="https://github.com/samvictor/FCMS#fcms-url-setting">https://github.com/samvictor/FCMS#fcms-url-setting</a>
-      </t><br>
-      <t>(Remember to include the "https://" and the trailing slash)</t>
-      <input id="root" class="form-control validate_me3 validate_root3 validate_notblank3" 
-            placeholder="https://example.com/ or https://example.com/sub/">
-      <div id="root_feedback" class="valid-feedback">
-        Please provide a valid FCMS URL.<br>
-        This is the root of your FCMS website. It is where the user's index.html is.
-      </div><br>
-      
-      <button id="save" class="btn btn-outline-success">Save</button><br>
     </div>
     
     
@@ -376,18 +469,24 @@
         $('.not_ready').fadeIn();
     }
     else {
+        var fcms_data = null;
+        var tabs_ready = false;
+        var tabs_sidebar_open = false;
         firebase.initializeApp(config);
+        var working_on = {'url':'', 'type':''};
         
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
                 // User is signed in.
                 $('.sign_in').fadeOut(() => {
+                    fcms_data = firebase.database().ref('fcms_data');
                     firebase.database().ref('fcms_data/gen_site_data/setup_complete').once('value')
                         .then(function(snap){
                             if(snap.val() === 'yes') {
                                 $('.step_1').animate({'margin-top': '-250px', 'opacity': '0'}, 'easein')
                                     .fadeOut(0);
                                 $('.step_3').fadeIn(); 
+                                setup_callbacks();
                                 do_assignment('general');
                             }
                             else {
@@ -660,6 +759,7 @@
                         $('.step_1').fadeOut();
                         $('.step_2').fadeOut(200, function() {
                             $('.step_3').fadeIn();
+                            setup_callbacks();
                             do_assignment('general');
                         });
                     },
@@ -714,36 +814,11 @@
         function do_assignment(assignment, details){
             assignment = assignment || 'general';
             
-            // tabs
-            $('.go_home').on('click', function() {
-                do_assignment('general');
-                $('#gen_tab').addClass('active');
-                $('#tabs_tab').removeClass('active');
-            });
-            $('#gen_tab').on('click', function() {
-                do_assignment('general');
-                $(this).addClass('active');
-                $('#tabs_tab').removeClass('active');
-            });
-            $('#tabs_tab').on('click', function() {
-                do_assignment('tab');
-                $(this).addClass('active');
-                $('#gen_tab').removeClass('active');
-            });
-            $('#site_color').on('keyup', function () {
-            	$('#color_display').css('background-color', this.value);
-            });
-            $('#save').on('click', submit3);
-            $('#root').on('keypress', function(e){
-            	if(e.which === 13) {
-                  submit3();
-              }
-            });
-        
             switch(assignment){
                 case 'general': 
                     console.log('doing general');
-                    firebase.database().ref('fcms_data/gen_site_data').on('value',
+                    fcms_data.child('gen_site_data').off();
+                    fcms_data.child('gen_site_data').on('value',
                         function(snap){
                             let data = snap.val();
                             console.log(data);
@@ -767,18 +842,193 @@
                             $('#site_color').val(data['color']);
                             $('#root').val(data['root']);
                             
+                            $('#tabs_content').fadeOut(200, function() {
+                                $('#general_content').fadeIn();
+                            });
                         }, 
                         function(error){
                             $('#alert_danger').text(error.message);
                             $('#alert_danger').fadeIn().delay(7000).fadeOut();
+                            
+                            
                         });
                 break;
                 case 'tab':
+                    fcms_data.child('gen_site_data/pages').off();
+                    fcms_data.child('gen_site_data/pages').on('value', function (snap) {
+                        let pages = snap.val();
+                        let pages_html = '<t>PAGES</t>'
+                                        +'<div id="tabs_sidebar_in">&lt;</div>';
+                        for (let url in pages) {
+                            let this_page = pages[url];
+                            pages_html += '<div class="sidebar_tab" sref="'
+                                                            +clean_make_url(url)+'">'
+                                            + clean_short_text(this_page['name'])
+                                        + '</div>';
+                        }
+                        
+                        $('#side_bar').html(pages_html);
+                        
+                        $('.sidebar_tab').on('click', function(){
+                            do_assignment('edit_page', {'url': $(this).attr('sref'), 'type': 'page'});
+                            
+                            $('.sidebar_tab').removeClass('active');
+                            $(this).addClass('active');
+                        });
+                        $('#tabs_sidebar_in').on('click', close_tab_sidebar);
+                    });
+                                        
+                    $('#general_content').fadeOut(200, function() {
+                        $('#tabs_content').fadeIn();
+                    });
                     console.log('doing tabs');
                 break;
+                case 'edit_page':
+                    
+                    fcms_data.child('pages/'+details['url']).once('value', function(snap){
+                        let page = snap.val();
+                        $('#tabs_main_title').text(page['name']);
+                        $('#tabs_main_text').val(get_components(page['content'])[0]['data']
+                            .replace(/😎shades_emoji😎/g, '😎')
+                                        .replace(/😎newline😎/g, '\n')
+                                        .replace(/😎tab😎/g, '\t'));
+                    });
+                    
+                    working_on['url'] = details['url'];
+                    working_on['type'] = 'page';
+                    
+                    // are we on a phone?
+                    let mobile = $(window).width() < 575;
+                    
+                    if (mobile) {
+                        close_tab_sidebar();
+                    }
+                    else {
+                        open_tab_sidebar();
+                    }
+                    tabs_ready = true;
+                    
+                break;
                 default:
+                    console.log('default reached in do assignment for ', assignment);
                     do_assignment('general'); // infinite loop potential
             }
+        }
+        
+        function close_tab_sidebar() {
+            let mobile = $(window).width() < 575;
+            
+            $('tabs_content').css('text-align', 'left');
+            $('#side_bar').animate({'width': '0%', 
+                            'opacity': '0', 
+                            'margin-left': '-40px',
+                            'margin-right': '40px'},
+                function(){
+                  $('#tabs_main').css('width', '97%');
+                  $('#tabs_main').fadeIn(400);
+                  if(!mobile)
+                    $('tabs_content').css('text-align', 'center');
+                });
+                
+            tabs_sidebar_open = false;    
+            $('#tabs_sidebar_out').fadeIn();
+            $('#tabs_sidebar_in').fadeOut();
+        }
+        function open_tab_sidebar () {
+            let mobile = $(window).width() < 575;
+            let to_width = '20%';
+            if (mobile) 
+                to_width = '100%';
+                
+            $('tabs_content').css('text-align', 'left');
+            $('#side_bar').animate({'width': to_width,
+                                'opacity': '1',
+                                'margin-left': '0px',
+                                'margin-right': '0px'});
+            $('#tabs_main').css('width', '79%');
+            $('#tabs_main').fadeIn(700);
+            
+            tabs_sidebar_open = true;
+            $('#tabs_sidebar_in').fadeIn();
+            $('#tabs_sidebar_out').fadeOut();
+        }
+        
+        function get_components(str) {
+            let raw_str = str
+                .replace(/&/g, '&amp;')
+                .replace(/>/g, '&gt;')
+                .replace(/</g, '&lt;')
+                .replace(/😎apos😎/g, '&apos;')
+                .replace(/😎quot😎/g, '&quot;');
+    
+            // must be valid json
+            // TODO: check db for enabled features for non admin users
+            // TODO: user chooses tab size
+            
+            let list_components = [];
+            let start_i = 0;
+            let end_i = 0;
+            let temp_str = '';
+            let temp_dict = {};
+            
+            let temp_edges = get_edges(raw_str);
+            start_i = temp_edges[0];
+            end_i = temp_edges[1];
+            
+            while (start_i >= 9 && end_i >= 0) {
+                temp_str = raw_str.substring(start_i, end_i + 1);
+                raw_str = raw_str.substring(end_i + 8);
+                
+                console.log('to json:', temp_str);
+                
+                try {
+                    temp_dict = JSON.parse(temp_str);
+                    list_components.push(temp_dict);
+                }
+                catch (e) {
+                    console.log('error converting to JSON while translating');
+                    console.log(e);
+                }
+                
+                temp_edges = get_edges(raw_str);
+                start_i = temp_edges[0];
+                end_i = temp_edges[1];
+            }
+            return list_components;
+        }
+        
+        function get_edges(str) {
+            let depth = 0;
+            let working_str = str;
+            let ret_list = [-1, -1];
+            let start_i = 0;
+            let end_i = 0;
+            ret_list[0] = working_str.indexOf('😎start😎') + 9;
+            
+            while (true) {
+                
+                start_i = working_str.indexOf('😎start😎') + 9;
+                end_i = working_str.indexOf('😎end😎') - 1;
+                if (start_i <= end_i && start_i >= 9) {
+                    depth += 1;
+                    working_str = working_str.replace('😎start😎', 'aaaaaaaaa');
+                }
+                else if(depth <= 0) {
+                    return ret_list;
+                }
+                else {
+                    depth -= 1;
+                    ret_list[1] = working_str.indexOf('😎end😎') - 1;
+                    working_str = working_str.replace('😎end😎', 'aaaaaaa');
+                }
+            }
+        }
+        
+        function encode_text(text) {
+            text = text.replace(/😎/g, '😎shades_emoji😎')
+                        .replace(/\n/g, '😎newline😎')
+                        .replace(/\t/g, '😎tab😎');
+            return '😎start😎{"type":"text", "data":"'+text+'"}😎end😎';
         }
         
         var all_valid3 = true;
@@ -922,7 +1172,73 @@
                         $('#alert_danger').fadeIn().delay(10000).fadeOut();
                     });
             }
-    
+        }
+        
+        
+        function setup_callbacks() {
+            console.log('setting up callbacks');
+            
+            $('.go_home').on('click', function() {
+                do_assignment('general');
+                $('#gen_tab').addClass('active');
+                $('#tabs_tab').removeClass('active');
+                $('#navbarSupportedContent').collapse('hide');
+            });
+            $('#gen_tab').on('click', function() {
+                do_assignment('general');
+                $(this).addClass('active');
+                $('#tabs_tab').removeClass('active');
+                $('#navbarSupportedContent').collapse('hide');
+            });
+            $('#tabs_tab').on('click', function() {
+                do_assignment('tab');
+                $(this).addClass('active');
+                $('#gen_tab').removeClass('active');
+                $('#navbarSupportedContent').collapse('hide');
+            });
+            $('#site_color').on('keyup', function () {
+            	$('#color_display').css('background-color', this.value);
+            });
+            $('#save').on('click', submit3);
+            $('#root').on('keypress', function(e){
+            	if(e.which === 13) {
+                  submit3();
+              }
+            });
+            
+            // tabs
+            $(window).resize(function () {
+                if (!tabs_ready)
+                    return;
+                // are we on a phone?
+                let mobile = $(window).width() < 575;
+                
+                if (mobile && tabs_sidebar_open ) {
+                    close_tab_sidebar();
+                }
+                else if (!mobile && !tabs_sidebar_open){
+                    open_tab_sidebar();
+                }
+            });
+            
+            $('#tabs_main_save').on('click', function(){
+                if(working_on['type'] === 'page') {
+                    let to_db = {};
+                    to_db['pages/'+working_on['url']+'/content'] = encode_text($('#tabs_main_text').val());
+                    
+                    fcms_data.update(to_db)
+                        .then(function(){
+                            $('#alert_success').text('Saved');
+                            $('#alert_success').fadeIn().delay(4000).fadeOut();
+                        },
+                        function(error) {
+                            $('#alert_danger').text('Failed to save: ' + error.message);
+                            $('#alert_danger').fadeIn().delay(10000).fadeOut();
+                        });
+                }
+            });
+            
+            $('#tabs_sidebar_out').on('click', open_tab_sidebar);
         }
     }
     
