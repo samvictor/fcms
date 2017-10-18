@@ -196,19 +196,36 @@
           margin-top: 7px;
           margin-bottom: 10px;
       }
+      #tabs_sidebar_in, #tabs_sidebar_out {
+          background-color: #ac2535;
+          transition: background-color 0.3s;
+          cursor: pointer;
+          border: solid 1px #666;
+          border-radius: 2.5px;
+          color: #eee;
+          padding: 9px 10px 10px 10px;
+      }
+      #tabs_sidebar_in:hover, #tabs_sidebar_out:hover {
+          background-color: #dc3545;
+          color: white;
+      }
       #tabs_sidebar_in {
           display: none;
           position: absolute;
           right: 0px;
-          top: 80px;
-          width: 20px;
+          top: 19px;
+          border-right: none;
+          border-top-right-radius: 0px;
+          border-bottom-right-radius: 0px;
       }
       #tabs_sidebar_out {
           display: none;
           position: fixed;
           left: 0px;
-          top: 80px;
-          width: 20px;
+          top: 59px;
+          border-left: none;
+          border-top-left-radius: 0px;
+          border-bottom-left-radius: 0px;
       }
       
       
@@ -472,8 +489,10 @@
         var fcms_data = null;
         var tabs_ready = false;
         var tabs_sidebar_open = false;
-        firebase.initializeApp(config);
+        var mobile_breakpoint = 575;
         var working_on = {'url':'', 'type':''};
+        
+        firebase.initializeApp(config);
         
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
@@ -915,10 +934,10 @@
             }
         }
         
+        
         function close_tab_sidebar() {
-            let mobile = $(window).width() < 575;
             
-            $('tabs_content').css('text-align', 'left');
+            $('#tabs_content').css('text-align', 'left');
             $('#side_bar').animate({'width': '0%', 
                             'opacity': '0', 
                             'margin-left': '-40px',
@@ -926,8 +945,9 @@
                 function(){
                   $('#tabs_main').css('width', '97%');
                   $('#tabs_main').fadeIn(400);
-                  if(!mobile)
-                    $('tabs_content').css('text-align', 'center');
+                  
+                  $('#tabs_content').css('text-align', 'center');
+                    
                 });
                 
             tabs_sidebar_open = false;    
@@ -935,12 +955,12 @@
             $('#tabs_sidebar_in').fadeOut();
         }
         function open_tab_sidebar () {
-            let mobile = $(window).width() < 575;
+            let mobile = $(window).width() < mobile_breakpoint;
             let to_width = '20%';
             if (mobile) 
                 to_width = '100%';
                 
-            $('tabs_content').css('text-align', 'left');
+            $('#tabs_content').css('text-align', 'left');
             $('#side_bar').animate({'width': to_width,
                                 'opacity': '1',
                                 'margin-left': '0px',
@@ -1211,7 +1231,7 @@
                 if (!tabs_ready)
                     return;
                 // are we on a phone?
-                let mobile = $(window).width() < 575;
+                let mobile = $(window).width() < mobile_breakpoint;
                 
                 if (mobile && tabs_sidebar_open ) {
                     close_tab_sidebar();
