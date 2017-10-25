@@ -1,4 +1,6 @@
 <!-- template_2.html-->
+<!-- license: MIT -->
+<!-- saminniss.com/fcms -->
 <!-- Written by Sam for fcms-->
 <!-- This view should show all, non admin pages in fcms-->
 <!-- version 1.0--><!DOCTYPE html>
@@ -464,7 +466,7 @@
             
             if (page_data['background_img']['url'] !== '' && page_data['background_img']['url'] !== '') {
                 $('body').css('background', 'url('+ clean_url( page_data['background_img']['url'] ) +') no-repeat')
-                    .css('background-size', 'cover').css('background-attachment', 'fixed');
+                    .css('background-size', 'cover').css('background-attachment', 'fixed').css('background-position', 'center');
             }
             
             // SLIDESHOW

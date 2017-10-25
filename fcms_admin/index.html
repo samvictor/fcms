@@ -1,4 +1,6 @@
 <!-- Written by Sam for fcms-->
+<!-- license: MIT -->
+<!-- saminniss.com/fcms -->
 <!-- fcms_admin/index.html-->
 <!-- This page should help complete the installation process-->
 <!DOCTYPE html>
@@ -188,7 +190,7 @@
       }
       #tabs_main_text {
           width: 100%;
-          height: calc(100% - 120px);
+          min-height: calc(100% - 120px);
           display: block;
           resize: none;
       }
@@ -478,6 +480,7 @@
   </body>
   <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
   <script src="../settings.js"></script>
+  <script src="../autosize.min.js"></script>
   <script>
     "use strict";
     
@@ -910,7 +913,9 @@
                         $('#tabs_main_text').val(get_components(page['content'])[0]['data']
                             .replace(/😎shades_emoji😎/g, '😎')
                                         .replace(/😎newline😎/g, '\n')
-                                        .replace(/😎tab😎/g, '\t'));
+                                        .replace(/😎tab😎/g, '\t')
+                                        .replace(/😎quot😎/g, '"'));
+                        autosize.update($('#tabs_main_text'));
                     });
                     
                     working_on['url'] = details['url'];
@@ -978,8 +983,7 @@
                 .replace(/&/g, '&amp;')
                 .replace(/>/g, '&gt;')
                 .replace(/</g, '&lt;')
-                .replace(/😎apos😎/g, '&apos;')
-                .replace(/😎quot😎/g, '&quot;');
+                .replace(/😎apos😎/g, '&apos;');
     
             // must be valid json
             // TODO: check db for enabled features for non admin users
@@ -1047,7 +1051,8 @@
         function encode_text(text) {
             text = text.replace(/😎/g, '😎shades_emoji😎')
                         .replace(/\n/g, '😎newline😎')
-                        .replace(/\t/g, '😎tab😎');
+                        .replace(/\t/g, '😎tab😎')
+                        .replace(/"/g, '😎quot😎');
             return '😎start😎{"type":"text", "data":"'+text+'"}😎end😎';
         }
         
@@ -1194,7 +1199,6 @@
             }
         }
         
-        
         function setup_callbacks() {
             console.log('setting up callbacks');
             
@@ -1225,6 +1229,8 @@
                   submit3();
               }
             });
+            
+            autosize($('#tabs_main_text'));
             
             // tabs
             $(window).resize(function () {
