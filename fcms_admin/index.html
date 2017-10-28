@@ -1,8 +1,8 @@
-<!-- Written by Sam for fcms-->
-<!-- license: MIT -->
-<!-- saminniss.com/fcms -->
-<!-- fcms_admin/index.html-->
-<!-- This page should help complete the installation process-->
+<!-- Written by Sam for fcms
+     license: MIT 
+     saminniss.com/fcms 
+     fcms_admin/index.html
+     This page should help complete the installation process-->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -188,11 +188,26 @@
           height: 100%;
           overflow-y: auto;
       }
-      #tabs_main_text {
+      #tabs_main_container{
+          min-height: calc(100% - 120px);  
+          text-align: center;
+      }
+      #tabs_main_container h5 {
+        padding-top: 14px;
+      }  
+      #tabs_main_container input {
+        text-align: center;
+      }  
+      #tabs_main p {
+        color: #555;
+      }
+      #tabs_main_text, .tabs_comp {
           width: 100%;
-          min-height: calc(100% - 120px);
+          min-height: 100%;
           display: block;
           resize: none;
+          padding: 5px;
+          padding-bottom: 20px;
       }
       #tabs_main_save {
           margin-top: 7px;
@@ -453,10 +468,12 @@
         <div id="tabs_main" style="display: none;">
             <h3 id="tabs_main_title"></h3>
             <div id="tabs_sidebar_out">&gt;</div>
-            Rememeber to save before moving to another page.
-            <textarea id="tabs_main_text">
-            </textarea>
-            <button id="tabs_main_save" class="btn btn-outline-success">Save</button><br>
+            <p>Don't forget to publish.</p>
+            <div id="tabs_main_container">
+                <textarea id="tabs_main_text">
+                </textarea>
+            </div>
+            <button id="tabs_main_save" class="btn btn-outline-success">Publish</button><br>
         </div>
       </div>
     </div>
@@ -493,7 +510,7 @@
         var tabs_ready = false;
         var tabs_sidebar_open = false;
         var mobile_breakpoint = 575;
-        var working_on = {'url':'', 'type':''};
+        var working_on = {'url':'', 'type':'', 'components': []};
         
         firebase.initializeApp(config);
         
@@ -760,9 +777,9 @@
                     }
         
                     tabs_keys.push(this_url);
-                    tabs_dir[this_url] = {'name': clean_short_text(tab_str), 'url': this_url, 'type': 'page'};
+                    tabs_dir[this_url] = {'name': clean_short_text(tab_str), 'url': this_url, 'type': 'page', 'order': i};
                     pages_dir[this_url] = {'name': clean_short_text(tab_str), 'url': this_url, 'type': 'page', 'content': 'Nothing here'};
-                    tabs_ordered[i.toString()] = {'name': clean_short_text(tab_str), 'url': this_url, 'type': 'page'};
+                    tabs_ordered[i.toString()] = {'name': clean_short_text(tab_str), 'url': this_url, 'type': 'page', 'order': i};
                     
                     if (i === 0) {
                         for_db['get_site_data']['default_url'] = this_url;
@@ -828,14 +845,13 @@
               submit();
           }
         });
-        $('textarea').autoResize();
-        
         
         
         //  ====================================== MAIN WORKER ======================================
         function do_assignment(assignment, details){
             assignment = assignment || 'general';
             
+            let mobile;
             switch(assignment){
                 case 'general': 
                     console.log('doing general');
@@ -876,23 +892,65 @@
                         });
                 break;
                 case 'tab':
-                    fcms_data.child('gen_site_data/pages').off();
-                    fcms_data.child('gen_site_data/pages').on('value', function (snap) {
-                        let pages = snap.val();
+                    fcms_data.child('gen_site_data').off();
+                    fcms_data.child('gen_site_data').on('value', function (snap) {
+                        let pages = snap.val()['pages'];
                         let pages_html = '<t>PAGES</t>'
                                         +'<div id="tabs_sidebar_in">&lt;</div>';
+                        let this_page;
                         for (let url in pages) {
-                            let this_page = pages[url];
+                            this_page = pages[url];
                             pages_html += '<div class="sidebar_tab" sref="'
-                                                            +clean_make_url(url)+'">'
+                                                            +clean_make_url(url)
+                                                            +'" type="page">'
                                             + clean_short_text(this_page['name'])
                                         + '</div>';
                         }
                         
+                        let tabs = snap.val()['tabs_ordered'];
+                        let this_tab;
+                        pages_html += '<t style="'
+                                            +'padding-top: 20px;'
+                                            +'display: block;'
+                                        +'">TABS</t>';
+                        for (let key in tabs) {
+                            this_tab = tabs[key];
+                            pages_html += '<div class="sidebar_tab" sref="'
+                                                            +clean_make_url(this_tab['url'])
+                                                            +'" type="tab">'
+                                            + clean_short_text(this_tab['name'])
+                                        + '</div>';
+                        }
+                        
+                        pages_html += '<t style="'
+                                            +'padding-top: 20px;'
+                                            +'display: block;'
+                                        +'">COMPONENTS</t>'
+                                        +'<div class="sidebar_tab" data="text" type="component">'
+                                            + 'Text</div>'
+                                        +'<div class="sidebar_tab" data="pretty_text" type="component">'
+                                            + 'Pretty Text</div>'
+                                        +'<div class="sidebar_tab" data="hr" type="component">'
+                                            + 'Divider</div>'
+                                        +'<div class="sidebar_tab" data="image" type="component">'
+                                            + 'Image</div>';
+                        
+                        pages_html += '<t style="'
+                                            +'padding-top: 20px;'
+                                            +'display: block;'
+                                        +'">PLUGINS</t>'
+                                        +'<div class="sidebar_tab" sref="spacewar" type="plugin">'
+                                            + 'Space War</div>';
+                        
                         $('#side_bar').html(pages_html);
                         
                         $('.sidebar_tab').on('click', function(){
-                            do_assignment('edit_page', {'url': $(this).attr('sref'), 'type': 'page'});
+                            let this_type = $(this).attr('type');
+                            if (this_type === 'page')
+                                do_assignment('edit_page', {'url': $(this).attr('sref'), 'type': this_type});
+                            else if(this_type === 'tab')
+                                do_assignment('edit_tab', {'url': $(this).attr('sref'), 'type': this_type});
+                                
                             
                             $('.sidebar_tab').removeClass('active');
                             $(this).addClass('active');
@@ -906,23 +964,111 @@
                     console.log('doing tabs');
                 break;
                 case 'edit_page':
-                    
                     fcms_data.child('pages/'+details['url']).once('value', function(snap){
                         let page = snap.val();
                         $('#tabs_main_title').text(page['name']);
-                        $('#tabs_main_text').val(get_components(page['content'])[0]['data']
-                            .replace(/😎shades_emoji😎/g, '😎')
-                                        .replace(/😎newline😎/g, '\n')
-                                        .replace(/😎tab😎/g, '\t')
-                                        .replace(/😎quot😎/g, '"'));
-                        autosize.update($('#tabs_main_text'));
+                        working_on['components'] = [];
+                        
+                        let components = get_components(page['content']);
+                        let comps_html = '';
+                        for (let i = 0; i < components.length; i++) {
+                            let this_comp = components[i];
+                            switch (this_comp['type']) {
+                                case 'text':
+                                    comps_html += '<textarea id="tabs_comp_'+i+'" class="tabs_comp">'
+                                                        +this_comp['data']
+                                                            .replace(/😎shades_emoji😎/g, '😎')
+                                                            .replace(/😎newline😎/g, '\n')
+                                                            .replace(/😎tab😎/g, '\t')
+                                                            .replace(/😎quot😎/g, '"')
+                                                        +'</textarea>';
+                                    working_on['components'].push({'type': 'text', 'html_id': 'tabs_comp_'+i});
+                                break;
+                                default:
+                                    console.log('Error: default reached in switch on this_comp');
+                            }
+                        }
+                        $('#tabs_main_container').html(comps_html);
+                        for (let i = 0; i < components.length; i++) {
+                            let this_comp = components[i];
+                            switch (this_comp['type']) {
+                                case 'text':
+                                    autosize($('#tabs_comp_' + i));
+                                break;
+                                default:
+                                    console.log('Error: default reached in switch on this_comp');
+                            }
+                        }
                     });
                     
                     working_on['url'] = details['url'];
                     working_on['type'] = 'page';
                     
                     // are we on a phone?
-                    let mobile = $(window).width() < 575;
+                    mobile = $(window).width() < 575;
+                    
+                    if (mobile) {
+                        close_tab_sidebar();
+                    }
+                    else {
+                        open_tab_sidebar();
+                    }
+                    tabs_ready = true;
+                    
+                break;
+                case 'edit_tab':
+                    fcms_data.child('gen_site_data').once('value', function(snap){
+                        let tab = snap.val()['tabs'][details['url']];
+                        let pages = snap.val()['pages'];
+                        $('#tabs_main_title').text(tab['name']);
+                        
+                        let container_html = '<h5>Name</h5>'
+                            + '<input id="tab_name" value="'+tab['name']+'"></input>'
+                            + '<h5>Type</h5>'
+                            + '<select id="tab_type" class="custom-select">'
+                            +   '<option '+ ((tab['type'] === 'page')? 'selected': '') +'>Page</option>'
+                            +   '<option '+ ((tab['type'] === 'link')? 'selected': '') +'>Link</option>'
+                            //+   '<option>Modal</option>'
+                            + '</select>'
+                        switch(tab['type']) {
+                            case 'page':
+                                container_html += '<h5>Page</h5>'
+                                    + '<select id="tab_target" class="custom-select">';
+                                for(let url in pages) {
+                                    if (url === tab['url'])
+                                        container_html += '<option selected title="'+pages[url]['name']+'">'+url+'</option>';
+                                    else
+                                        container_html += '<option title="'+pages[url]['name']+'">'+url+'</option>';
+                                }
+                                container_html += '</select>'
+                                
+                                    + '<h5>Order</h5>'
+                                    + '<select id="tab_order" class="custom-select">';
+                                let num_tabs = Object.keys(snap.val()['tabs']).length;
+                                for (let i = 0; i < num_tabs; i++) {
+                                    if (i === tab['order'])
+                                        container_html += '<option selected>'+(i+1)+'</option>';
+                                    else
+                                        container_html += '<option>'+(i+1)+'</option>';
+                                }
+                                container_html += '</select>';
+                                
+                            break;
+                            case 'link':
+                            break;
+                            default:
+                                console.log('Error: default reached switching on tab[type] for type = ' 
+                                            + tab['type'])
+                        }
+                        
+                        $('#tabs_main_container').html(container_html);
+                    });
+                    
+                    working_on['url'] = details['url'];
+                    working_on['type'] = 'tab';
+                    
+                    // are we on a phone?
+                    mobile = $(window).width() < 575;
                     
                     if (mobile) {
                         close_tab_sidebar();
@@ -1230,7 +1376,6 @@
               }
             });
             
-            autosize($('#tabs_main_text'));
             
             // tabs
             $(window).resize(function () {
@@ -1250,7 +1395,16 @@
             $('#tabs_main_save').on('click', function(){
                 if(working_on['type'] === 'page') {
                     let to_db = {};
-                    to_db['pages/'+working_on['url']+'/content'] = encode_text($('#tabs_main_text').val());
+                    
+                    let to_db_str = '';
+                    let this_component = {};
+                    for(let i = 0; i < working_on['components'].length; i++) {
+                        this_component = working_on['components'][i];
+                        if (this_component['type'])
+                            to_db_str += encode_text($('#'+this_component['html_id']).val());
+                    }
+                    
+                    to_db['pages/'+working_on['url']+'/content'] = to_db_str;
                     
                     fcms_data.update(to_db)
                         .then(function(){
