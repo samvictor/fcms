@@ -76,7 +76,7 @@
       .alert {
         display: none;
         position: fixed;
-        top: 15px;
+        top: 60px;
         left: 50%;
         transform: translateX(-50%);
         width: 80%;
@@ -188,9 +188,17 @@
           height: 100%;
           overflow-y: auto;
       }
-      #tabs_main_container{
-          min-height: calc(100% - 120px);  
+      #tabs_main #new_page_name {
+          text-align: center;  
+      }
+      #tabs_main_container {
+          min-height: calc(100% - 150px);  
           text-align: center;
+          border: solid 1px black;
+          border-radius: 2.5px;
+          background-color: #fefefe;
+          padding: 5px;
+          padding-bottom: 18px;
       }
       #tabs_main_container h5 {
         padding-top: 14px;
@@ -463,7 +471,6 @@
       </div>
       <div id="tabs_content" style="display: none">
         <div id="side_bar">
-            <t>PAGE</t>
         </div>
         <div id="tabs_main" style="display: none;">
             <h3 id="tabs_main_title"></h3>
@@ -763,11 +770,14 @@
                 let this_url = '';
                 let counter = 1;
                 tabs.forEach(function(tab_str, i){
-                    if (tab_str.length === 0)
+                    if (tab_str.length === 0) {
                         return;
+                    }
                     
-                    // TODO create url from string, check url is unique, add to dir and keys
                     this_url = clean_make_url(tab_str);
+                    if (this_url.length === 0)
+                        return;
+                        
                     if (tabs_keys.includes(this_url)) {
                         this_url = clean_make_url(tab_str)+counter;
                         while (tabs_keys.includes(this_url)) {
@@ -777,14 +787,22 @@
                     }
         
                     tabs_keys.push(this_url);
-                    tabs_dir[this_url] = {'name': clean_short_text(tab_str), 'url': this_url, 'type': 'page', 'order': i};
+                    // for pages, "url" is it's unique id, but for tabs, "url" is the target and "id" is it's unique id. 
+                    // I know that's confusing, sorry.
+                    tabs_dir[this_url] = {'name': clean_short_text(tab_str), 'url': this_url, 'type': 'page', 'order': i, 'id': this_url};
                     pages_dir[this_url] = {'name': clean_short_text(tab_str), 'url': this_url, 'type': 'page', 'content': 'Nothing here'};
-                    tabs_ordered[i.toString()] = {'name': clean_short_text(tab_str), 'url': this_url, 'type': 'page', 'order': i};
+                    tabs_ordered[i.toString()] = {'name': clean_short_text(tab_str), 'url': this_url, 'type': 'page', 'order': i, 'id': this_url};
                     
                     if (i === 0) {
                         for_db['get_site_data']['default_url'] = this_url;
                     }
                 });
+                
+                if (tabs_keys.length === 0) { 
+                    $('#alert_danger').text('Failed to save: Invalid tab names.');
+                    $('#alert_danger').fadeIn().delay(10000).fadeOut();
+                    return;
+                }
                 
                 for_db['gen_site_data']['tabs'] = tabs_dir;
                 for_db['gen_site_data']['tabs_ordered'] = tabs_ordered;
@@ -900,12 +918,19 @@
                         let this_page;
                         for (let url in pages) {
                             this_page = pages[url];
-                            pages_html += '<div class="sidebar_tab" sref="'
-                                                            +clean_make_url(url)
-                                                            +'" type="page">'
+                            
+                            if (working_on['type'] === 'page' && working_on['url'] === url)
+                                pages_html += '<div class="sidebar_tab active" sref="';
+                            else
+                                pages_html += '<div class="sidebar_tab" sref="';
+                            
+                            pages_html +=           clean_make_url(url)
+                                                    +'" type="page">'
                                             + clean_short_text(this_page['name'])
                                         + '</div>';
                         }
+                        pages_html += '<div class="sidebar_tab" sref="[new_page]" type="page">'
+                                          +'+ New Page</div>';
                         
                         let tabs = snap.val()['tabs_ordered'];
                         let this_tab;
@@ -915,12 +940,18 @@
                                         +'">TABS</t>';
                         for (let key in tabs) {
                             this_tab = tabs[key];
-                            pages_html += '<div class="sidebar_tab" sref="'
-                                                            +clean_make_url(this_tab['url'])
-                                                            +'" type="tab">'
+                            
+                            if (working_on['type'] === 'tab' && working_on['url'] === this_tab['id'])
+                                pages_html += '<div class="sidebar_tab active" sref="';
+                            else
+                                pages_html += '<div class="sidebar_tab" sref="';
+                            pages_html +=        clean_make_url(this_tab['id'])
+                                                 +'" type="tab">'
                                             + clean_short_text(this_tab['name'])
                                         + '</div>';
                         }
+                        pages_html += '<div class="sidebar_tab" sref="[new_tab]" type="tab">'
+                                          +'+ New Tab</div>';
                         
                         pages_html += '<t style="'
                                             +'padding-top: 20px;'
@@ -933,14 +964,18 @@
                                         +'<div class="sidebar_tab" data="hr" type="component">'
                                             + 'Divider</div>'
                                         +'<div class="sidebar_tab" data="image" type="component">'
-                                            + 'Image</div>';
+                                            + 'Image</div>'
+                                        +'<div class="sidebar_tab" data="iframe" type="component">'
+                                            + 'IFrame</div>';
                         
                         pages_html += '<t style="'
                                             +'padding-top: 20px;'
                                             +'display: block;'
                                         +'">PLUGINS</t>'
                                         +'<div class="sidebar_tab" sref="spacewar" type="plugin">'
-                                            + 'Space War</div>';
+                                            + 'Space War</div>'
+                                        +'<div class="sidebar_tab" sref="maps" type="plugin">'
+                                            + 'Google Maps</div>'; // send extra data for unique map
                         
                         $('#side_bar').html(pages_html);
                         
@@ -964,9 +999,30 @@
                     console.log('doing tabs');
                 break;
                 case 'edit_page':
-                    fcms_data.child('pages/'+details['url']).once('value', function(snap){
-                        let page = snap.val();
-                        $('#tabs_main_title').text(page['name']);
+                    let db_url = '';
+                    if(details['url'] !== '[new_page]')
+                        db_url = 'pages/'+details['url'];
+                    else {
+                        // new page. make db get any small data
+                        db_url = 'gen_site_data/color';
+                    }
+                    fcms_data.child(db_url).once('value', function(snap){
+                        let page;
+                        if(details['url'] === '[new_page]') {
+                            // new page
+                            page = {
+                                'name': 'New Page', 
+                                'content': '😎start😎{"type":"text", "data":"Nothing Here"}😎end😎'
+                            };
+                            $('#tabs_main_title').html('<input id="new_page_name" '
+                                                            +'placeholder="New Page Name">'
+                                                       +'</input>');
+                        }
+                        else {
+                            page = snap.val();
+                            $('#tabs_main_title').text(page['name']);
+                        }
+                        
                         working_on['components'] = [];
                         
                         let components = get_components(page['content']);
@@ -1018,7 +1074,14 @@
                 break;
                 case 'edit_tab':
                     fcms_data.child('gen_site_data').once('value', function(snap){
-                        let tab = snap.val()['tabs'][details['url']];
+                        let tab;
+                        if( details['url'] !== '[new_tab]' )
+                            tab = snap.val()['tabs'][details['url']];
+                        else {
+                            // create new tab
+                            tab = {'type': 'page', 'order': -1, 'name': 'New Tab', 'url': '', 'id': ''};
+                        }
+                        
                         let pages = snap.val()['pages'];
                         $('#tabs_main_title').text(tab['name']);
                         
@@ -1030,9 +1093,10 @@
                             +   '<option '+ ((tab['type'] === 'link')? 'selected': '') +'>Link</option>'
                             //+   '<option>Modal</option>'
                             + '</select>'
+                        let num_tabs = -1;
                         switch(tab['type']) {
                             case 'page':
-                                container_html += '<h5>Page</h5>'
+                                container_html += '<h5 id="target_label">Page</h5>'
                                     + '<select id="tab_target" class="custom-select">';
                                 for(let url in pages) {
                                     if (url === tab['url'])
@@ -1044,7 +1108,7 @@
                                 
                                     + '<h5>Order</h5>'
                                     + '<select id="tab_order" class="custom-select">';
-                                let num_tabs = Object.keys(snap.val()['tabs']).length;
+                                num_tabs = Object.keys(snap.val()['tabs']).length;
                                 for (let i = 0; i < num_tabs; i++) {
                                     if (i === tab['order'])
                                         container_html += '<option selected>'+(i+1)+'</option>';
@@ -1052,16 +1116,79 @@
                                         container_html += '<option>'+(i+1)+'</option>';
                                 }
                                 container_html += '</select>';
+                            break;
                                 
-                            break;
                             case 'link':
+                                container_html += '<h5 id="target_label">Page</h5>'
+                                    + '<input id="tab_target" value="' + tab['url'] + '">'
+                                    + '</input>'
+                                
+                                    + '<h5>Order</h5>'
+                                    + '<select id="tab_order" class="custom-select">';
+                                num_tabs = Object.keys(snap.val()['tabs']).length;
+                                for (let i = 0; i < num_tabs; i++) {
+                                    if (i === tab['order'])
+                                        container_html += '<option selected>'+(i+1)+'</option>';
+                                    else
+                                        container_html += '<option>'+(i+1)+'</option>';
+                                }
+                                container_html += '</select>';
                             break;
+                                
                             default:
                                 console.log('Error: default reached switching on tab[type] for type = ' 
-                                            + tab['type'])
+                                            + tab['type']);
                         }
                         
                         $('#tabs_main_container').html(container_html);
+                        
+                        $('#tab_type').on('change', function() {
+                            $('#tab_target').remove();
+                            let temp_html = '';
+                            switch(this.value) {
+                                case 'Page':
+                                    fcms_data.child('gen_site_data/pages').once('value', function(snap){
+                                        let temp_pages = snap.val();
+                                        
+                                        temp_html = '<select id="tab_target" class="custom-select">';
+                                            for(let url in temp_pages) {
+                                                if (url === working_on['url'])
+                                                    temp_html += '<option selected title="'+temp_pages[url]['name']+'">'+url+'</option>';
+                                                else
+                                                    temp_html += '<option title="'+temp_pages[url]['name']+'">'+url+'</option>';
+                                            }
+                                        temp_html += '</select>';
+
+                                        $('#target_label').text('Page').after(temp_html);
+                                    });
+                                break;
+                                    
+                                case 'Link':
+                                    if (working_on['url'] !== '[new_tab]')
+                                        fcms_data.child('gen_site_data/tabs/'+working_on['url']).once('value', function(snap){
+                                            let this_tab = snap.val();
+
+                                            temp_html = '<input id="tab_target" ';
+                                                if (this_tab['type'] === 'link') {
+                                                    temp_html += ' value="' + this_tab['url'] + '"';
+                                                }
+                                            temp_html += '></input>';
+
+                                            $('#target_label').text('URL').after(temp_html);
+                                        });
+                                    else {                                            
+                                        temp_html = '<input id="tab_target">'
+                                                    + '</input>';
+
+                                        $('#target_label').text('URL').after(temp_html);
+                                    }
+                                break;
+                                    
+                                default: 
+                                    console.log('Error: default reached in #tab_type on change for value = '
+                                               + this.value);
+                            }
+                        });
                     });
                     
                     working_on['url'] = details['url'];
@@ -1085,6 +1212,7 @@
             }
         }
         
+        // ========================================= HELPER FUNCTIONS ====================================
         
         function close_tab_sidebar() {
             
@@ -1404,17 +1532,66 @@
                             to_db_str += encode_text($('#'+this_component['html_id']).val());
                     }
                     
-                    to_db['pages/'+working_on['url']+'/content'] = to_db_str;
-                    
-                    fcms_data.update(to_db)
-                        .then(function(){
-                            $('#alert_success').text('Saved');
-                            $('#alert_success').fadeIn().delay(4000).fadeOut();
-                        },
-                        function(error) {
-                            $('#alert_danger').text('Failed to save: ' + error.message);
+                    if (working_on['url'] === '[new_page]') {
+                        let new_name = document.querySelector('#new_page_name').value;
+                        if (new_name === '') {
+                            $('#alert_danger').text('Error: Page name cannot be blank');
                             $('#alert_danger').fadeIn().delay(10000).fadeOut();
+                        }
+                        
+                        let new_url = clean_make_url(new_name);
+                        if (new_url.length === 0) {
+                            $('#alert_danger').text('Error: Invalid page name');
+                            $('#alert_danger').fadeIn().delay(10000).fadeOut();
+                            return;
+                        }
+                        
+                        fcms_data.child('gen_site_data/pages').once('value', function(snap){
+                            let tabs_keys = Object.keys(snap.val());
+                            let counter = 1;
+                            if (tabs_keys.includes(new_url)) {
+                                new_url = clean_make_url(new_name)+counter;
+                                while (tabs_keys.includes(new_url)) {
+                                    counter += 1;
+                                    new_url = clean_make_url(new_name)+counter;
+                                }
+                            }
+                            
+                            to_db['gen_site_data/pages/'+new_url] = {
+                                'name': new_name,
+                                'type': 'page',
+                                'url': new_url
+                            };
+                            to_db['pages/'+new_url] = {
+                                'content': to_db_str,
+                                'name': new_name,
+                                'type': 'page',
+                                'url': new_url
+                            };
+                            fcms_data.update(to_db)
+                                .then(function(){
+                                    $('#alert_success').text('Saved');
+                                    $('#alert_success').fadeIn().delay(4000).fadeOut();
+                                },
+                                function(error) {
+                                    $('#alert_danger').text('Failed to save: ' + error.message);
+                                    $('#alert_danger').fadeIn().delay(10000).fadeOut();
+                                });
                         });
+                    }
+                    else {
+                        to_db['pages/'+working_on['url']+'/content'] = to_db_str;
+                    
+                        fcms_data.update(to_db)
+                            .then(function(){
+                                $('#alert_success').text('Saved');
+                                $('#alert_success').fadeIn().delay(4000).fadeOut();
+                            },
+                            function(error) {
+                                $('#alert_danger').text('Failed to save: ' + error.message);
+                                $('#alert_danger').fadeIn().delay(10000).fadeOut();
+                            });
+                    }
                 }
             });
             
@@ -1436,4 +1613,10 @@ if you have a custom domain (example.com), make sure your FCMS URL includes your
 clean text before displaying
 
 split user posts to another list to fanout. nexus!?
+
+
+bugs:
+home back to tabs, arrow gone
+after new page submit, clear or move
+
 -->
