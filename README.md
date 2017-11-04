@@ -127,87 +127,16 @@ In the *Rules* tab, add the following rules:
 ```
 
 "fcms_data": {
-      ".read": false,
-    	".write": "auth.uid === '<YOUR ADMIN AUTH UID HERE>'",
-        
-    	"gen_site_data": {
+    ".read": false,
+    ".write": "auth.uid === '<YOUR ADMIN AUTH UID HERE>'",
+    
+    "gen_site_data": {
         ".read": true
-      },
-      "pages": {
+    },
+    "pages": {
         ".read": true
-      },
-        
-      "users": {
-        ".read": false,
-        ".indexOn": ["username", "full_name", "last_login", "privacy", "hidden"],
-        "$uid": {
-        	".read": "$uid === auth.uid",
-        	".write": "$uid === auth.uid",
-            
-          "pub_data": {
-            ".read": true,
-          },
-          "friend_data": {
-            "$connection": {
-              ".read": "$uid === auth.uid || 
-              					data.parent().parent().child('connection')
-                          .child($connection).child(auth.uid).exists()",
-            }
-          },
-          "priv_data": {
-            ".read": "$uid === auth.uid"
-          },
-            
-          "connection": {
-            ".read": "$uid === auth.uid ||
-            					data.child('friends').child(auth.uid).exists()",
-          },
-            
-          "posts_made": {
-            ".indexOn": ["date_made", "target_user", "target_post", "type", "privacy", "hidden"],
-            "$pid": {
-              ".read": "$uid === auth.uid ||
-              					(data.child('privacy').val() === 'public' && 
-                         	data.child('type').val() != 'message') ||
-              					data.child('list_targets').child(auth.uid).exists()",
-            },
-          },
-          "posts_received": {
-        		".read": "$uid === auth.uid",
-            ".indexOn": ["date_recieved", "target_post", "source", "type", "privacy", "hidden"]
-          },
-            
-          "wall": {
-        		".read": true,
-            ".indexOn": ["date_made", "target_post", "source", "type", "hidden"]
-          },
-          "connected_wall": {
-            "$connection": {
-              ".read": "$uid === auth.uid ||
-                        data.parent().parent().child('connection')
-                        	.child($connection).child(auth.uid).exists()",
-              ".indexOn": ["date_made", "target_post", "source", "type", "privacy", "hidden"]
-            }
-          },
-          "priv_wall": {
-        		".read": "$uid === auth.uid",
-            ".indexOn": ["date_made", "target_post", "source", "type", "hidden"]
-          }
-        }
-      },
-      "public_user_list": {
-        ".read": "auth != null",
-      },
-      "nexus": {
-        ".read": true,
-        ".write": "auth != null",
-        ".indexOn": ["date", "target_user", "source", "type"],
-        "$nid": {
-          ".write": "!data.exists() ||
-          						data.child('target_user').val() === auth.uid"
-        } 
-      }
-    }
+    },
+}
 
 ```
 
