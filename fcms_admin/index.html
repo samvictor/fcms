@@ -475,7 +475,7 @@
         <div id="tabs_main" style="display: none;">
             <h3 id="tabs_main_title"></h3>
             <div id="tabs_sidebar_out">&gt;</div>
-            <p>Don't forget to publish.</p>
+            <p>Don't forget to publish!</p>
             <div id="tabs_main_container">
                 <textarea id="tabs_main_text">
                 </textarea>
@@ -932,7 +932,7 @@
                         pages_html += '<div class="sidebar_tab" sref="[new_page]" type="page">'
                                           +'+ New Page</div>';
                         
-                        /*
+                        
                         let tabs = snap.val()['tabs_ordered'];
                         let this_tab;
                         pages_html += '<t style="'
@@ -953,7 +953,7 @@
                         }
                         pages_html += '<div class="sidebar_tab" sref="[new_tab]" type="tab">'
                                           +'+ New Tab</div>';
-                        
+                        /*
                         pages_html += '<t style="'
                                             +'padding-top: 20px;'
                                             +'display: block;'
@@ -983,9 +983,9 @@
                         $('.sidebar_tab').on('click', function(){
                             let this_type = $(this).attr('type');
                             if (this_type === 'page')
-                                do_assignment('edit_page', {'url': $(this).attr('sref'), 'type': this_type});
+                                do_assignment('edit_page', {'url': $(this).attr('sref')});
                             else if(this_type === 'tab')
-                                do_assignment('edit_tab', {'url': $(this).attr('sref'), 'type': this_type});
+                                do_assignment('edit_tab', {'url': $(this).attr('sref')});
                                 
                             
                             $('.sidebar_tab').removeClass('active');
@@ -1060,6 +1060,7 @@
                     
                     working_on['url'] = details['url'];
                     working_on['type'] = 'page';
+                    $('.sidebar_tab[type="page"][sref="'+details['url']+'"]').addClass('active');
                     
                     // are we on a phone?
                     mobile = $(window).width() < 575;
@@ -1076,18 +1077,19 @@
                 case 'edit_tab':
                     fcms_data.child('gen_site_data').once('value', function(snap){
                         let tab;
-                        if( details['url'] !== '[new_tab]' )
+                        if( details['url'] !== '[new_tab]' ) {
                             tab = snap.val()['tabs'][details['url']];
+                            $('#tabs_main_title').text(tab['name']);
+                        }
                         else {
                             // create new tab
-                            tab = {'type': 'page', 'order': -1, 'name': 'New Tab', 'url': '', 'id': ''};
+                            tab = {'type': 'page', 'order': -1, 'name': '', 'url': '', 'id': ''};
+                            $('#tabs_main_title').text('New Tab');
                         }
                         
-                        let pages = snap.val()['pages'];
-                        $('#tabs_main_title').text(tab['name']);
                         
                         let container_html = '<h5>Name</h5>'
-                            + '<input id="tab_name" value="'+tab['name']+'"></input>'
+                            + '<input id="tab_name" value="'+tab['name']+'" placeholder="Tab Name"></input>'
                             + '<h5>Type</h5>'
                             + '<select id="tab_type" class="custom-select">'
                             +   '<option '+ ((tab['type'] === 'page')? 'selected': '') +'>Page</option>'
@@ -1097,6 +1099,7 @@
                         let num_tabs = -1;
                         switch(tab['type']) {
                             case 'page':
+                                let pages = snap.val()['pages'];
                                 container_html += '<h5 id="target_label">Page</h5>'
                                     + '<select id="tab_target" class="custom-select">';
                                 for(let url in pages) {
@@ -1105,41 +1108,34 @@
                                     else
                                         container_html += '<option title="'+pages[url]['name']+'">'+url+'</option>';
                                 }
-                                container_html += '</select>'
-                                
-                                    + '<h5>Order</h5>'
-                                    + '<select id="tab_order" class="custom-select">';
-                                num_tabs = Object.keys(snap.val()['tabs']).length;
-                                for (let i = 0; i < num_tabs; i++) {
-                                    if (i === tab['order'])
-                                        container_html += '<option selected>'+(i+1)+'</option>';
-                                    else
-                                        container_html += '<option>'+(i+1)+'</option>';
-                                }
                                 container_html += '</select>';
                             break;
-                                
+                            
                             case 'link':
                                 container_html += '<h5 id="target_label">Page</h5>'
                                     + '<input id="tab_target" value="' + tab['url'] + '">'
-                                    + '</input>'
-                                
-                                    + '<h5>Order</h5>'
-                                    + '<select id="tab_order" class="custom-select">';
-                                num_tabs = Object.keys(snap.val()['tabs']).length;
-                                for (let i = 0; i < num_tabs; i++) {
-                                    if (i === tab['order'])
-                                        container_html += '<option selected>'+(i+1)+'</option>';
-                                    else
-                                        container_html += '<option>'+(i+1)+'</option>';
-                                }
-                                container_html += '</select>';
+                                    + '</input>';
                             break;
                                 
                             default:
                                 console.log('Error: default reached switching on tab[type] for type = ' 
                                             + tab['type']);
                         }
+                        
+                        container_html += '<h5>Order</h5>'
+                            + '<select id="tab_order" class="custom-select">';
+                        num_tabs = Object.keys(snap.val()['tabs']).length;
+                        for (let i = 0; i < num_tabs; i++) {
+                            if (i === tab['order'])
+                                container_html += '<option selected>'+(i+1)+'</option>';
+                            else
+                                container_html += '<option>'+(i+1)+'</option>';
+                        }
+                        
+                        if (details['url'] === '[new_tab]')
+                          container_html += '<option>'+(num_tabs+1)+'</option>';
+                          
+                        container_html += '</select>';
                         
                         $('#tabs_main_container').html(container_html);
                         
@@ -1194,6 +1190,7 @@
                     
                     working_on['url'] = details['url'];
                     working_on['type'] = 'tab';
+                    $('.sidebar_tab[type="tab"][sref="'+details['url']+'"]').addClass('active');
                     
                     // are we on a phone?
                     mobile = $(window).width() < 575;
@@ -1548,11 +1545,11 @@
                         }
                         
                         fcms_data.child('gen_site_data/pages').once('value', function(snap){
-                            let tabs_keys = Object.keys(snap.val());
+                            let pages_keys = Object.keys(snap.val());
                             let counter = 1;
-                            if (tabs_keys.includes(new_url)) {
+                            if (pages_keys.includes(new_url)) {
                                 new_url = clean_make_url(new_name)+counter;
-                                while (tabs_keys.includes(new_url)) {
+                                while (pages_keys.includes(new_url)) {
                                     counter += 1;
                                     new_url = clean_make_url(new_name)+counter;
                                 }
@@ -1571,8 +1568,9 @@
                             };
                             fcms_data.update(to_db)
                                 .then(function(){
-                                    $('#alert_success').text('Saved');
+                                    $('#alert_success').text('Page Created');
                                     $('#alert_success').fadeIn().delay(4000).fadeOut();
+                                    do_assignment('edit_page', {'url': new_url});
                                 },
                                 function(error) {
                                     $('#alert_danger').text('Failed to save: ' + error.message);
@@ -1594,6 +1592,152 @@
                             });
                     }
                 }
+                else if(working_on['type'] === 'tab') {
+                    let to_db = {};
+                    
+                    let new_name = document.querySelector('#tab_name').value;
+                    new_name = clean_short_text(new_name);
+                    if (new_name === '') {
+                        $('#alert_danger').text('Error: Tab name cannot be blank');
+                        $('#alert_danger').fadeIn().delay(10000).fadeOut();
+                    }
+                    
+                    let new_type = document.querySelector('#tab_type').value.toLowerCase();
+                    let new_content = document.querySelector('#tab_target').value;
+                    // be careful, this also affects tab urls
+                    new_content = clean_url(new_content); 
+                    
+                    let new_order = parseInt(document.querySelector('#tab_order').value) - 1;
+                    
+                    
+                    if (working_on['url'] === '[new_tab]') {
+                        
+                        fcms_data.child('gen_site_data').once('value', function(snap) {
+                            
+                            let new_url = clean_make_url(new_name);
+                            if (new_url.length === 0) {
+                                $('#alert_danger').text('Error: Invalid tab name');
+                                $('#alert_danger').fadeIn().delay(10000).fadeOut();
+                                return;
+                            }
+                            
+                            let tabs_keys = Object.keys(snap.val()['tabs']);
+                            let counter = 1;
+                            if (tabs_keys.includes(new_url)) {
+                                new_url = clean_make_url(new_name)+counter;
+                                while (tabs_keys.includes(new_url)) {
+                                    counter += 1;
+                                    new_url = clean_make_url(new_name)+counter;
+                                }
+                            }
+                            
+                            
+                            let tabs_from_db = snap.val()['tabs'];
+                            
+                            let num_tabs = Object.keys(snap.val()['tabs_ordered']).length;
+                            // last taken order is num_tabs - 1
+                            if (new_order < num_tabs) {
+                              // the order you want is taken, move everyone else over.
+                              for (var tab_key in tabs_from_db) {
+                                let temp_order = tabs_from_db[tab_key]['order'];
+                                if (temp_order >= new_order)
+                                  tabs_from_db[tab_key]['order'] = temp_order + 1;
+                              }
+                            }
+                            
+                            // now that everything is moved over, take that order
+                            tabs_from_db[new_url] = {
+                              'id': new_url,
+                              'name': new_name,
+                              'order': new_order,
+                              'type': new_type,
+                              'url': new_content
+                            };
+                            
+                            //replace old data completely
+                            to_db['gen_site_data/tabs'] = tabs_from_db;
+                            
+                            to_db['gen_site_data/tabs_ordered'] = [];
+                            for(var tab_key in tabs_from_db) {
+                              let temp_tab = tabs_from_db[tab_key];
+                              
+                              to_db['gen_site_data/tabs_ordered'][temp_tab['order']] = temp_tab;
+                            }
+                            
+                            
+                            fcms_data.update(to_db)
+                                .then(function(){
+                                    $('#alert_success').text('Tab Created');
+                                    $('#alert_success').fadeIn().delay(4000).fadeOut();
+                                    do_assignment('edit_tab', {'url': new_url});
+                                },
+                                function(error) {
+                                    $('#alert_danger').text('Failed to save: ' + error.message);
+                                    $('#alert_danger').fadeIn().delay(10000).fadeOut();
+                                });
+                            
+                        });
+                        
+                    }
+                    else {
+                        
+                        fcms_data.child('gen_site_data').once('value', function(snap){
+                            
+                            let tabs_from_db = snap.val()['tabs'];
+                            let old_order = tabs_from_db[working_on['url']]['order'];
+                            
+                            if (new_order < old_order) {
+                              // the order you want is taken, move everyone else up.
+                              for (var tab_key in tabs_from_db) {
+                                let temp_order = tabs_from_db[tab_key]['order'];
+                                if (temp_order >= new_order && temp_order < old_order)
+                                  tabs_from_db[tab_key]['order'] = temp_order + 1;
+                              }
+                            }
+                            else if (new_order > old_order) {
+                              // the order you want is taken, move everyone else down.
+                              for (let tab_key in tabs_from_db) {
+                                let temp_order = tabs_from_db[tab_key]['order'];
+                                if (temp_order <= new_order && temp_order > old_order)
+                                  tabs_from_db[tab_key]['order'] = temp_order - 1;
+                              }
+                            }
+                            
+                            // now that everything is moved over, 
+                            //   take that order, and update data
+                            tabs_from_db[working_on['url']] = {
+                              'id': working_on['url'],
+                              'name': new_name,
+                              'order': new_order,
+                              'type': new_type,
+                              'url': new_content
+                            };
+                            
+                            // replace old data completely
+                            to_db['gen_site_data/tabs'] = tabs_from_db;
+                            
+                            to_db['gen_site_data/tabs_ordered'] = [];
+                            for(let tab_key in tabs_from_db) {
+                              let temp_tab = tabs_from_db[tab_key];
+                              
+                              to_db['gen_site_data/tabs_ordered'][temp_tab['order']] = temp_tab;
+                            }
+                            
+                            
+                            fcms_data.update(to_db)
+                                .then(function(){
+                                    $('#alert_success').text('Tab Updated');
+                                    $('#alert_success').fadeIn().delay(4000).fadeOut();
+                                },
+                                function(error) {
+                                    $('#alert_danger').text('Failed to save: ' + error.message);
+                                    $('#alert_danger').fadeIn().delay(10000).fadeOut();
+                                });
+                            
+                        });
+                    }
+                }
+
             });
             
             $('#tabs_sidebar_out').on('click', open_tab_sidebar);
@@ -1627,5 +1771,6 @@ Edit tabs as well as tabs ordered
 new page should optionally make new tab
 client support for link tabs
 plugins
+external links fail
 
 -->

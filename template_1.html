@@ -26,7 +26,7 @@
         height: 100%;
       }
       body {
-      	background-color: #f2f2f2;
+      	background-color: #252525;
       	/*background: linear-gradient(to bottom, #404040 0%,  #404040 70%, #101010 80%, #101010 100%);*/
       }
       h1, h2, h3, h4, h5, h6, t, p, body {
@@ -507,7 +507,13 @@
                 tabs_html += '<div id="'+ clean_db(tab['url']) +'_tab" class="tab ';
                 if (tab['url'] === page_data['url'] || page_data['url'] === '' && tab['url'] === page_data['default_url'])
                     tabs_html += 'active';
-                tabs_html += '" href='+ clean_db(tab['url']) +'>'+ clean_short_txt(tab['name']).toUpperCase() + '</div>';
+                
+                if (tab['type'] === 'link')
+                   tabs_html += '" href='+ clean_url(tab['url']) +' external="true">';
+                else
+                   tabs_html += '" href='+ clean_db(tab['url']) +'>';
+                
+                tabs_html +=  clean_short_txt(tab['name']).toUpperCase() + '</div>';
             }
             $('#tab_bar').html(tabs_html);
             
@@ -522,8 +528,17 @@
             loading = false;
             document.title = page_data['page_title'] + ' - ' + page_data['name'];
             $('.tab').each(function(){
-                $(this).on('click', function(){
-                	do_assignment('page', $(this).attr('href'));
+                $(this).on('click', function(e) {
+                  e.preventDefault();
+                  if($(this).attr('external') === 'true') {
+                    let temp_href = $(this).attr('href');
+                    if (temp_href.substring(0, 4) !== 'http')
+                      temp_href = 'https://' + temp_href;
+                    
+                    window.location.href = temp_href;
+                  }
+                  else
+                  	do_assignment('page', $(this).attr('href'));
                 });
             });
             $('head').append('<link rel="icon" href="'+page_data['favicon_url']+'">');
