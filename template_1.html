@@ -385,6 +385,7 @@
         }
     }
 
+    let for_off = {'url': '', 'callback': null};
     
     firebase.database().ref('fcms_data/gen_site_data').on('value', function(snapshot) {
             page_data = snapshot.val();
@@ -413,7 +414,11 @@
                 // we need content, title, and url
                 let temp_url = page_data['default_url'];
                 
-                firebase.database().ref('fcms_data/pages/' + temp_url).on('value', function(snap2) {
+                if (for_off['callback'] !== null)
+                  firebase.database().ref('fcms_data/pages/' + for_off['url']).off('value', for_off['callback']);
+                
+                for_off['url'] = temp_url;
+                for_off['callback'] = firebase.database().ref('fcms_data/pages/' + temp_url).on('value', function(snap2) {
                     temp_page = snap2.val(); 
                     page_data['page_title'] = clean_short_txt(temp_page['name']);
                     page_data['page_content'] = translate_content(temp_page['content']);
@@ -422,7 +427,12 @@
             }
             else {
                 // we need content, title, and url
-                firebase.database().ref('fcms_data/pages/' + page_data['url']).on('value', function(snap2) {
+                
+                if (for_off['callback'] !== null)
+                  firebase.database().ref('fcms_data/pages/' + for_off['url']).off('value', for_off['callback']);
+                
+                for_off['url'] = page_data['url'];
+                for_off['callback'] = firebase.database().ref('fcms_data/pages/' + page_data['url']).on('value', function(snap2) {
                     temp_page = snap2.val();
                     if (temp_page === null) {
                         // 404
@@ -573,7 +583,10 @@
                 	new_url = page_data['default_url'];
                 	
                 curr_url = new_url;
-                firebase.database().ref('/fcms_data/pages/'+new_url).once('value', function(snapshot){
+                
+                firebase.database().ref('fcms_data/pages/' + for_off['url']).off('value', for_off['callback']);
+                for_off['url'] = new_url;
+                for_off['callback'] = firebase.database().ref('/fcms_data/pages/'+new_url).on('value', function(snapshot){
                     let page = snapshot.val();
                     if (page !== null) {
                         $('#page_title').text( clean_short_txt(page['name'].toUpperCase()) );
