@@ -155,6 +155,9 @@
       	background-color: #202020;
       	border: solid 1px black;
       }
+      #carousel_inner{
+        text-align: center;
+      }
       td {
           vertical-align: middle !important;
       }
@@ -481,17 +484,18 @@
             }
             else {
                 slideshow_images = page_data['slideshow']['imgs'];
+                $('#slideshow').css('display', 'block');
             }
             for(let i = 0; i < slideshow_images.length; i++){
             	if (i === 0)
-                    slideshow_html += '<div class="item active" >';
+                    slideshow_html += '<div class="carousel-item active" >';
                 else
-                    slideshow_html += '<div class="item" >';
+                    slideshow_html += '<div class="carousel-item" >';
             	slideshow_html +=     '<img alt="carousel image" src="'+ clean_url( slideshow_images[i]['url'] ); 
             	slideshow_html +=                                          '" class="slideshow_image" />';
             	slideshow_html += '</div> ';
             }
-            $('#carousel_inner').append(slideshow_html);
+            $('#carousel_inner').html(slideshow_html);
             if (page_data['header_img']['url'] !== '') {
                 $('#site_title').css('display', 'none');
                 $('#header_image').css('display', 'block').attr('src', clean_url( page_data['header_img']['url'] ));
@@ -621,6 +625,9 @@
         // curr_url = event.state['new_url'];
         do_assignment('page', event.state['new_url'], false);
     };
+    
+    
+    
   </script>
 </html>
 

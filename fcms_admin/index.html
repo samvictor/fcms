@@ -1742,6 +1742,16 @@
             
             $('#tabs_sidebar_out').on('click', open_tab_sidebar);
         }
+        
+        // do this once
+        
+        firebase.database().ref('fcms_data/gen_site_data/favicon_url').on('value', function(snapshot) {
+          let favicon_url = clean_url(snapshot.val());
+          if (favicon_url !== null && favicon_url !== '') 
+            $('head').append('<link rel="icon" href="'+ favicon_url +'">');
+        });
+
+          
     }
     
   </script>
